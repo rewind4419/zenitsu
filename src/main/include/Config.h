@@ -56,6 +56,19 @@ constexpr double TURBO_DRIVE_SPEED = 1.0;    // Turbo/fast mode
 constexpr double NORMAL_TURN_SPEED = 0.8;    // Normal turning multiplier
 
 // =============================================================================
+// SAFETY CONFIGURATION
+// =============================================================================
+
+constexpr double CONTROLLER_TIMEOUT = 0.5;  // Controller disconnect timeout (seconds)
+constexpr bool REQUIRE_DEADMAN_SWITCH = true; // Require L2 to be held for driving
+
+// =============================================================================
+// SENSOR CONFIGURATION
+// =============================================================================
+
+constexpr int NAVX_PORT = 0;  // MXP port on roboRIO
+
+// =============================================================================
 // CONTROLLER CONFIGURATION (PlayStation DualShock)
 // =============================================================================
 
@@ -66,7 +79,8 @@ constexpr double JOYSTICK_DEADBAND = 0.1;    // Ignore inputs smaller than this
 // - Left stick: Drive translation (forward/back, left/right)
 // - Right stick: Rotation (left/right only)
 // - L1 (button 5): Precision mode (slow, careful driving)
-// - R1 (button 6): Turbo mode (fast driving)
-// - Share (button 9): Available for custom functions
-// - Options (button 10): Available for custom functions  
-// - PS Button (button 14): Available for custom functions
+// - R1 (button 6): Turbo mode (fast driving)  
+// - L2 (button 7): Deadman switch (MUST be held to drive)
+// - Share (button 9): Toggle field-relative mode
+// - Options (button 10): Reset gyroscope
+// - PS Button (button 14): Emergency stop

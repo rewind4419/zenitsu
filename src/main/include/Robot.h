@@ -1,6 +1,7 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
+#include <AHRS.h>
 #include <memory>
 
 #include "Drivetrain.h"
@@ -30,9 +31,12 @@ private:
     // Hardware
     std::unique_ptr<Drivetrain> m_drivetrain;
     std::unique_ptr<GamepadInput> m_gamepadInput;
+    std::unique_ptr<AHRS> m_navx;
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
+    bool m_emergencyStop = false; // Emergency stop state
+    bool m_calibrationMode = false; // Encoder calibration mode
     
     /**
      * Handle teleop driving
@@ -43,4 +47,9 @@ private:
      * Update dashboard values  
      */
     void updateDashboard();
+    
+    /**
+     * Handle calibration mode
+     */
+    void handleCalibration();
 };

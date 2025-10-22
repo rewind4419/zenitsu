@@ -51,6 +51,12 @@ public:
     bool getPSButton() const;
     
     /**
+     * Safety functions
+     */
+    bool getDeadmanSwitch() const;      // L2 trigger (required for driving)
+    bool isControllerConnected() const; // Check controller connection status
+    
+    /**
      * Get the current speed multiplier based on active modes
      * @return Speed multiplier (0.0 to 1.0)
      */
@@ -69,4 +75,8 @@ private:
     bool m_shareButton = false;
     bool m_optionsButton = false; 
     bool m_psButton = false;
+    bool m_deadmanSwitch = false;
+    
+    // Safety state
+    double m_lastControllerUpdate = 0.0;
 };

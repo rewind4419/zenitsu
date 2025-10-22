@@ -1,6 +1,8 @@
 #include "GamepadInput.h"
 #include "Config.h"
 
+#include <frc/Timer.h>
+
 GamepadInput::GamepadInput(int controllerPort) {
     m_controller = std::make_unique<frc::Joystick>(controllerPort);
 }
@@ -28,11 +30,15 @@ void GamepadInput::update() {
     // Update button states using PlayStation DualShock button mapping
     m_precisionMode = m_controller->GetRawButton(5);  // L1 (left bumper)
     m_turboMode = m_controller->GetRawButton(6);      // R1 (right bumper)
+    m_deadmanSwitch = m_controller->GetRawButton(7);  // L2 (left trigger) - SAFETY
     
     // Update PlayStation-specific buttons
     m_shareButton = m_controller->GetRawButton(9);    // Share button
     m_optionsButton = m_controller->GetRawButton(10); // Options button
     m_psButton = m_controller->GetRawButton(14);      // PlayStation button
+    
+    // Update safety timestamp
+    m_lastControllerUpdate = frc::Timer::GetFPGATimestamp().value();
 }
 
 Vector2D GamepadInput::getDriveTranslation() const {
@@ -73,4 +79,13 @@ bool GamepadInput::getOptionsButton() const {
 
 bool GamepadInput::getPSButton() const {
     return m_psButton;
+}
+
+bool GamepadInput::getDeadmanSwitch() const {
+    return m_deadmanSwitch;
+}
+
+bool GamepadInput::isControllerConnected() const {
+    double currentTime = frc::Timer::GetFPGATimestamp().value();
+    return (currentTime - m_lastControllerUpdate) < CONTROLLER_TIMEOUT;
 }
