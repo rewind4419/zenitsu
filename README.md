@@ -5,8 +5,7 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 ## 🚀 Quick Start
 
 ### Hardware Requirements
-- 4x REV SparkMax motor controllers (drive motors)
-- 4x REV SparkMax motor controllers (steering motors) 
+- 4x REV SparkMax motors and controllers
 - 4x CTRE CANcoder absolute encoders
 - 1x NavX gyroscope (MXP port)
 - PlayStation DualShock controller
@@ -15,7 +14,7 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 1. **Install WPILib 2025** - [Download here](https://wpilib.org)
 2. **Clone this repository**
    ```bash
-   git clone <repo-url>
+   git clone [<repo-url>](https://github.com/rewind4419/zenitsu.git)
    cd zenitsu
    ```
 3. **Build the project**
@@ -28,7 +27,7 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
    ```
 
 ### First Time Setup
-1. **Configure CAN IDs** in `src/main/include/Config.h` to match your robot
+1. **Configure CAN IDs** in `src/main/include/Config.h` to match the robot
 2. **Calibrate encoders** - See [Calibration Guide](docs/calibration.md)
 3. **Test with controller** - See [Controller Guide](docs/controller.md)
 
@@ -58,7 +57,7 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 ## 📚 Documentation
 - [Controller Reference](docs/controller.md)
 - [Calibration Procedures](docs/calibration.md) 
-- [Development Guide](docs/development.md)
+- [Deployment Guide](docs/deployment.md)
 
 ## 📝 Notes
 - REV motor config (brake mode/current limits) is wrapped in a guard so CI builds without REV vendordeps still compile; on the robot these settings apply automatically.
