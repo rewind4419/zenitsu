@@ -25,15 +25,15 @@ jobs:
     - name: Build Robot Code
       run: ./gradlew --no-daemon build
       
-    - name: Run Tests
-      run: ./gradlew --no-daemon test
+    - name: Run Google Tests (Debug)
+      run: ./gradlew --no-daemon testExternalNativeDebug
 
     # GoogleTest outputs may not be present yet; skip publishing if none
     - name: Test Results
       uses: dorny/test-reporter@v1
       if: success() || failure()
       with:
-        name: Test Results
-        path: 'build/test-results/**/*.xml'
+        name: Test Results (GoogleTest)
+        path: 'build/test-results/testExternalNativeDebug/*.xml'
         reporter: java-junit
         fail-on-empty: false
