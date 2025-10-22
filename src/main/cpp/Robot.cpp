@@ -11,7 +11,8 @@ void Robot::RobotInit() {
     // Initialize hardware
     m_drivetrain = std::make_unique<Drivetrain>();
     m_gamepadInput = std::make_unique<GamepadInput>(DRIVER_CONTROLLER_PORT);
-    m_navx = std::make_unique<AHRS>(frc::SPI::Port::kMXP);
+    // TODO: Initialize NavX once vendor dependency is sorted
+    // m_navx = std::make_unique<AHRS>(frc::SPI::Port::kMXP);
     
     // Initialize dashboard
     frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
@@ -22,6 +23,7 @@ void Robot::RobotInit() {
     printf("🗾⚡ Zenitsu Robot Initialized!\n");
     printf("⚡ Press L1+R1+Options to enter calibration mode\n");
     printf("⚡ Press PS button for emergency stop\n");
+    printf("⚡ Note: NavX gyroscope support will be added once vendor dependency is configured\n");
 }
 
 void Robot::RobotPeriodic() {
@@ -119,10 +121,10 @@ void Robot::handleTeleopDrive() {
     speeds.omega = rotation * MAX_ANGULAR_SPEED;
     
     // Drive the robot
-    if (m_fieldRelative && m_navx->IsConnected()) {
-        // Use NavX for true field-relative driving
-        double gyroAngle = degreesToRadians(m_navx->GetYaw());
-        m_drivetrain->driveFieldRelative(speeds, gyroAngle);
+    if (m_fieldRelative) {
+        // TODO: Use NavX for true field-relative driving once gyro is available
+        // For now, use robot-relative even in "field-relative" mode
+        m_drivetrain->drive(speeds);
     } else {
         // Robot-relative driving
         m_drivetrain->drive(speeds);
@@ -138,12 +140,12 @@ void Robot::handleTeleopDrive() {
     }
     lastShareButton = currentShareButton;
     
-    // Reset gyro with Options button
+    // Reset gyro with Options button (placeholder for now)
     static bool lastOptionsButton = false;
     bool currentOptionsButton = m_gamepadInput->getOptionsButton();
     if (currentOptionsButton && !lastOptionsButton) {
-        m_navx->Reset();
-        printf("⚡ NavX gyroscope reset to zero\n");
+        // TODO: Reset NavX when gyro is available
+        printf("⚡ Gyro reset requested (NavX not yet configured)\n");
     }
     lastOptionsButton = currentOptionsButton;
 }
@@ -152,15 +154,10 @@ void Robot::updateDashboard() {
     // Update drivetrain telemetry
     m_drivetrain->updateTelemetry();
     
-    // Update NavX telemetry
-    if (m_navx->IsConnected()) {
-        frc::SmartDashboard::PutNumber("Gyro Yaw", m_navx->GetYaw());
-        frc::SmartDashboard::PutNumber("Gyro Pitch", m_navx->GetPitch());
-        frc::SmartDashboard::PutNumber("Gyro Roll", m_navx->GetRoll());
-        frc::SmartDashboard::PutBoolean("NavX Connected", true);
-    } else {
-        frc::SmartDashboard::PutBoolean("NavX Connected", false);
-    }
+    // Update NavX telemetry (placeholder)
+    // TODO: Add real NavX telemetry once gyro is configured
+    frc::SmartDashboard::PutBoolean("NavX Connected", false);
+    frc::SmartDashboard::PutString("Gyro Status", "NavX support pending");
     
     // Update input info
     Vector2D translation = m_gamepadInput->getDriveTranslation();

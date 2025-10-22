@@ -1,86 +1,12 @@
 See file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt for all output for compileFrcUserProgramDebugExecutableFrcUserProgramCpp.
-compiling Main.cpp failed.
-In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/Main.cpp:2:
-/Users/alwatson/Downloads/zenitsu/src/main/include/Robot.h:4:10: fatal error: AHRS.h: No such file or directory
-    4 | #include <AHRS.h>
-      |          ^~~~~~~~
-compilation terminated.
+compiling GamepadInput.cpp successful.
 
-compiling Robot.cpp failed.
-In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:1:
-/Users/alwatson/Downloads/zenitsu/src/main/include/Robot.h:4:10: fatal error: AHRS.h: No such file or directory
-    4 | #include <AHRS.h>
-      |          ^~~~~~~~
-compilation terminated.
-
-compiling GamepadInput.cpp failed.
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp: In member function 'void GamepadInput::update()':
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:33:5: error: 'm_deadmanSwitch' was not declared in this scope
-   33 |     m_deadmanSwitch = m_controller->GetRawButton(7);  // L2 (left trigger) - SAFETY
-      |     ^~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp: At global scope:
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:84:6: error: no declaration matches 'bool GamepadInput::getDeadmanSwitch() const'
-   84 | bool GamepadInput::getDeadmanSwitch() const {
-      |      ^~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:84:6: note: no functions named 'bool GamepadInput::getDeadmanSwitch() const'
-In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:1:
-/Users/alwatson/Downloads/zenitsu/src/main/include/GamepadInput.h:13:7: note: 'class GamepadInput' defined here
-   13 | class GamepadInput {
-      |       ^~~~~~~~~~~~
-
-compiling SwerveModule.cpp failed.
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp: In member function 'void SwerveModule::configureMotors()':
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:86:19: error: 'class rev::spark::SparkMax' has no member named 'RestoreFactoryDefaults'
-   86 |     m_driveMotor->RestoreFactoryDefaults();
-      |                   ^~~~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:87:19: error: 'class rev::spark::SparkMax' has no member named 'SetIdleMode'; did you mean 'IdleMode'?
-   87 |     m_driveMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
-      |                   ^~~~~~~~~~~
-      |                   IdleMode
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:88:19: error: 'class rev::spark::SparkMax' has no member named 'SetSmartCurrentLimit'
-   88 |     m_driveMotor->SetSmartCurrentLimit(40);  // 40A limit
-      |                   ^~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:90:32: error: 'class rev::spark::SparkRelativeEncoder' has no member named 'SetPositionConversionFactor'
-   90 |     m_driveMotor->GetEncoder().SetPositionConversionFactor(WHEEL_RADIUS * 2 * M_PI / DRIVE_GEAR_RATIO);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:91:32: error: 'class rev::spark::SparkRelativeEncoder' has no member named 'SetVelocityConversionFactor'
-   91 |     m_driveMotor->GetEncoder().SetVelocityConversionFactor(WHEEL_RADIUS * 2 * M_PI / DRIVE_GEAR_RATIO / 60.0);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:94:19: error: 'class rev::spark::SparkMax' has no member named 'RestoreFactoryDefaults'
-   94 |     m_steerMotor->RestoreFactoryDefaults();
-      |                   ^~~~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:95:19: error: 'class rev::spark::SparkMax' has no member named 'SetIdleMode'; did you mean 'IdleMode'?
-   95 |     m_steerMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
-      |                   ^~~~~~~~~~~
-      |                   IdleMode
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:96:19: error: 'class rev::spark::SparkMax' has no member named 'SetSmartCurrentLimit'
-   96 |     m_steerMotor->SetSmartCurrentLimit(20);  // 20A limit for steering
-      |                   ^~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:100:14: error: 'class rev::spark::SparkClosedLoopController' has no member named 'SetP'
-  100 |     steerPID.SetP(0.1);   // Start with conservative PID values
-      |              ^~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:101:14: error: 'class rev::spark::SparkClosedLoopController' has no member named 'SetI'
-  101 |     steerPID.SetI(0.0);
-      |              ^~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:102:14: error: 'class rev::spark::SparkClosedLoopController' has no member named 'SetD'
-  102 |     steerPID.SetD(0.0);
-      |              ^~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:103:14: error: 'class rev::spark::SparkClosedLoopController' has no member named 'SetFF'
-  103 |     steerPID.SetFF(0.0);
-      |              ^~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:104:14: error: 'class rev::spark::SparkClosedLoopController' has no member named 'SetOutputRange'
-  104 |     steerPID.SetOutputRange(-1.0, 1.0);
-      |              ^~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:107:32: error: 'class rev::spark::SparkRelativeEncoder' has no member named 'SetPositionConversionFactor'
-  107 |     m_steerMotor->GetEncoder().SetPositionConversionFactor(2 * M_PI / STEER_GEAR_RATIO);
-      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:111:19: error: 'class rev::spark::SparkMax' has no member named 'BurnFlash'
-  111 |     m_driveMotor->BurnFlash();
-      |                   ^~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:112:19: error: 'class rev::spark::SparkMax' has no member named 'BurnFlash'
-  112 |     m_steerMotor->BurnFlash();
-      |                   ^~~~~~~~~
+compiling SwerveModule.cpp successful.
 
 compiling Drivetrain.cpp successful.
+
+compiling Robot.cpp successful.
+
+compiling Main.cpp successful.
 
 Finished compileFrcUserProgramDebugExecutableFrcUserProgramCpp, see full log file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt.
