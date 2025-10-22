@@ -19,11 +19,14 @@ jobs:
         distribution: temurin
         java-version: '21'
 
+    - name: Install RoboRIO Toolchain
+      run: ./gradlew --no-daemon installRoboRioToolchain
+
     - name: Build Robot Code
-      run: ./gradlew build
+      run: ./gradlew --no-daemon build
       
     - name: Run Tests
-      run: ./gradlew test
+      run: ./gradlew --no-daemon test
 
     - name: Test Results
       uses: dorny/test-reporter@v1
@@ -31,4 +34,4 @@ jobs:
       with:
         name: Test Results
         path: 'build/test-results/**/*.xml'
-        reporter: java-junit
+        reporter: junit
