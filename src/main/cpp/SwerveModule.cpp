@@ -28,12 +28,27 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
     const double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;
     m_driveMotor->Set(driveOutput);
 
-    // Simple P control for steering in radians (keeps dependencies minimal)
-    double angleError = constrainAngle(optimizedState.angle - currentAngle);
-    double steerCmd = STEER_P_GAIN * angleError; // unitless output
-    if (steerCmd > 1.0) steerCmd = 1.0;
-    if (steerCmd < -1.0) steerCmd = -1.0;
-    m_steerMotor->Set(steerCmd);
+    // Steering: prefer onboard position PID if available, else simple P
+    #if USE_ONBOARD_STEER_PID
+    {
+        // If steer encoder is set to radians via conversion factor, target is radians
+        // Otherwise convert to motor rotations: angle(rad) * STEER_GEAR_RATIO / (2π)
+        double targetPosition = optimizedState.angle;
+        #ifndef REV_BRUSHLESS
+        targetPosition = optimizedState.angle / (2.0 * M_PI) * STEER_GEAR_RATIO;
+        #endif
+        auto ctrl = m_steerMotor->GetClosedLoopController();
+        ctrl.SetReference(targetPosition, rev::spark::SparkMax::ControlType::kPosition);
+    }
+    #else
+    {
+        double angleError = constrainAngle(optimizedState.angle - currentAngle);
+        double steerCmd = STEER_P_GAIN * angleError; // unitless output
+        if (steerCmd > 1.0) steerCmd = 1.0;
+        if (steerCmd < -1.0) steerCmd = -1.0;
+        m_steerMotor->Set(steerCmd);
+    }
+    #endif
 
     m_lastAngle = optimizedState.angle;
 }
@@ -91,6 +106,16 @@ SwerveModuleState SwerveModule::optimizeState(const SwerveModuleState& desiredSt
 
 void SwerveModule::configureMotors() {
     // Idle mode and current limits
+    // NOTE for students:
+    // We wrap the REV-specific configuration in a preprocessor guard so CI/simulation
+    // builds (which may not have the REV vendor library available) still compile.
+    // On the real robot image, the REV library is present and these lines will run,
+    // enabling brake mode (modules hold position when you release sticks) and current
+    // limits (protects breakers and prevents brownouts). If you always have the REV
+    // vendordep installed in your environment, you can instead use
+    //   #if __has_include(<rev/SparkMax.h>)
+    // as the guard condition.
+    // These settings are essential for a controllable swerve drivetrain on the robot.
     // Apply brake mode and current limits where APIs are available
     #ifdef REV_BRUSHLESS
     m_driveMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
@@ -101,7 +126,7 @@ void SwerveModule::configureMotors() {
 
     // Conversion factors for student-friendly units
     const double driveCF = (WHEEL_RADIUS * 2.0 * M_PI) / DRIVE_GEAR_RATIO; // rotations → meters
-    // Enable conversion factors when available
+    // Enable conversion factors when available (lets encoders report meters / m/s / radians)
     #ifdef REV_BRUSHLESS
     m_driveMotor->GetEncoder().SetPositionConversionFactor(driveCF);
     m_driveMotor->GetEncoder().SetVelocityConversionFactor(driveCF / 60.0);

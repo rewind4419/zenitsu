@@ -67,6 +67,9 @@ constexpr double CONTROLLER_TIMEOUT = 0.5;  // Controller disconnect timeout (se
 
 constexpr double STEER_P_GAIN = 2.0;        // Simple P control for steering (unit: output/radian)
 
+// Prefer motor-controller onboard PID for steering if available
+#define USE_ONBOARD_STEER_PID 1
+
 // =============================================================================
 // ENCODER OFFSETS (radians) - set after calibration
 // =============================================================================
