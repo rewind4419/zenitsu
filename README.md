@@ -14,7 +14,7 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 1. **Install WPILib 2025** - [Download here](https://wpilib.org)
 2. **Clone this repository**
    ```bash
-   git clone [<repo-url>](https://github.com/rewind4419/zenitsu.git)
+   git clone https://github.com/rewind4419/zenitsu.git
    cd zenitsu
    ```
 3. **Build the project**
