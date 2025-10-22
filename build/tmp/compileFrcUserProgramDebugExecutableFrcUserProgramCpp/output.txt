@@ -1,19 +1,11 @@
 See file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt for all output for compileFrcUserProgramDebugExecutableFrcUserProgramCpp.
-compiling GamepadInput.cpp successful.
-
 compiling SwerveModule.cpp successful.
 /Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp: In member function 'void SwerveModule::configureMotors()':
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:132:18: warning: unused variable 'driveCF' [-Wunused-variable]
-  132 |     const double driveCF = (WHEEL_RADIUS * 2.0 * M_PI) / DRIVE_GEAR_RATIO; // rotations → meters
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:146:18: warning: unused variable 'driveCF' [-Wunused-variable]
+  146 |     const double driveCF = (WHEEL_RADIUS * 2.0 * M_PI) / DRIVE_GEAR_RATIO; // rotations → meters
       |                  ^~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:139:18: warning: unused variable 'steerCF' [-Wunused-variable]
-  139 |     const double steerCF = (2.0 * M_PI) / STEER_GEAR_RATIO; // rotations → radians
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:153:18: warning: unused variable 'steerCF' [-Wunused-variable]
+  153 |     const double steerCF = (2.0 * M_PI) / STEER_GEAR_RATIO; // rotations → radians
       |                  ^~~~~~~
-
-compiling Robot.cpp successful.
-
-compiling Main.cpp successful.
-
-compiling Drivetrain.cpp successful.
 
 Finished compileFrcUserProgramDebugExecutableFrcUserProgramCpp, see full log file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt.

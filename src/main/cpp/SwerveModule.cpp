@@ -58,17 +58,31 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
 }
 
 SwerveModuleState SwerveModule::getCurrentState() const {
+    #ifdef REV_BRUSHLESS
+    // Encoder configured to report m/s directly
+    return {
+        .speed = m_driveMotor->GetEncoder().GetVelocity(),
+        .angle = getAbsoluteAngle()
+    };
+    #else
+    // Fallback for CI/sim: compute m/s from RPM
     return {
         .speed = m_driveMotor->GetEncoder().GetVelocity() * WHEEL_RADIUS * 2 * M_PI / 60.0 / DRIVE_GEAR_RATIO,
         .angle = getAbsoluteAngle()
     };
+    #endif
 }
 
 double SwerveModule::getDrivePosition() const {
-    // Convert motor rotations to wheel distance
+    #ifdef REV_BRUSHLESS
+    // Encoder configured to report meters directly
+    return m_driveMotor->GetEncoder().GetPosition();
+    #else
+    // Fallback for CI/sim: convert motor rotations to meters
     double motorRotations = m_driveMotor->GetEncoder().GetPosition();
     double wheelRotations = motorRotations / DRIVE_GEAR_RATIO;
     return wheelRotations * WHEEL_RADIUS * 2 * M_PI;
+    #endif
 }
 
 void SwerveModule::resetDriveEncoder() {
