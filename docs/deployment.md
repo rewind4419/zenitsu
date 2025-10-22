@@ -23,7 +23,6 @@
 ```bash
 ./gradlew build          # Build only
 ./gradlew deploy         # Build and deploy 
-./gradlew simulateJava   # Run simulator
 ```
 
 ## Troubleshooting Deploy

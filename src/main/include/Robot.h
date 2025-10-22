@@ -1,6 +1,7 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
+#include <Studica/AHRS.h>
 #include <memory>
 
 #include "Drivetrain.h"
@@ -30,8 +31,7 @@ private:
     // Hardware
     std::unique_ptr<Drivetrain> m_drivetrain;
     std::unique_ptr<GamepadInput> m_gamepadInput;
-    // TODO: Add NavX gyroscope once vendor dependency is sorted
-    // std::unique_ptr<AHRS> m_navx;
+    std::unique_ptr<studica::AHRS> m_navx;
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
