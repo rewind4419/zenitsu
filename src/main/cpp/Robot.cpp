@@ -29,6 +29,9 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutBoolean("Emergency Stop", m_emergencyStop);
     frc::SmartDashboard::PutBoolean("Calibration Mode", m_calibrationMode);
     frc::SmartDashboard::PutString("Robot State", "Initialized");
+
+    // Show field view for odometry (CONFIGURABLE: use during autos/tuning)
+    frc::SmartDashboard::PutData("Field", &m_field);
     
     printf("🗾⚡ Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
     printf("⚡ NavX gyroscope connected for field-relative driving\n");
@@ -42,6 +45,12 @@ void Robot::RobotPeriodic() {
     
     // Update telemetry
     updateDashboard();
+
+    // Update odometry and field visualization when NavX is present
+    #if NAVX_AVAILABLE
+    auto pose = m_drivetrain->updateOdometry(m_navx->IsConnected() ? degreesToRadians(m_navx->GetYaw()) : 0.0);
+    m_field.SetRobotPose(pose);
+    #endif
 }
 
 void Robot::AutonomousInit() {
@@ -124,11 +133,31 @@ void Robot::handleTeleopDrive() {
     Vector2D translation = m_gamepadInput->getDriveTranslation();
     double rotation = m_gamepadInput->getRotation() * NORMAL_TURN_SPEED;
     
-    // Create chassis speeds
+    // Compute target chassis speeds (CONFIGURABLE: tune rates in Config.h)
+    const double target_vx = translation.x * MAX_DRIVE_SPEED;
+    const double target_vy = translation.y * MAX_DRIVE_SPEED;
+    const double target_omega = rotation * MAX_ANGULAR_SPEED * NORMAL_TURN_SPEED;
+
+    // Apply simple manual slew limiting using delta time
+    double now = frc::Timer::GetFPGATimestamp().value();
+    double dt = now - m_lastUpdateSec;
+    m_lastUpdateSec = now;
+    auto clampRate = [dt](double prev, double target, double rateLimit) {
+        double maxDelta = rateLimit * std::max(0.0, dt);
+        double delta = target - prev;
+        if (delta > maxDelta) delta = maxDelta;
+        if (delta < -maxDelta) delta = -maxDelta;
+        return prev + delta;
+    };
+
+    m_prevVx    = clampRate(m_prevVx,    target_vx,    SLEW_RATE_VX);
+    m_prevVy    = clampRate(m_prevVy,    target_vy,    SLEW_RATE_VY);
+    m_prevOmega = clampRate(m_prevOmega, target_omega, SLEW_RATE_OMEGA);
+
     ChassisSpeed speeds;
-    speeds.vx = translation.x * MAX_DRIVE_SPEED;
-    speeds.vy = translation.y * MAX_DRIVE_SPEED;
-    speeds.omega = rotation * MAX_ANGULAR_SPEED;
+    speeds.vx    = m_prevVx;
+    speeds.vy    = m_prevVy;
+    speeds.omega = m_prevOmega;
     
     // Drive the robot
     #if NAVX_AVAILABLE

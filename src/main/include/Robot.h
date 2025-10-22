@@ -1,6 +1,8 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
+#include <frc/filter/SlewRateLimiter.h>  // Input smoothing (tune rates per team preference)
+#include <frc/smartdashboard/Field2d.h> // Visualize odometry on dashboard
 
 #if __has_include(<Studica/AHRS.h>)
 #include <Studica/AHRS.h>
@@ -45,6 +47,18 @@ private:
     bool m_fieldRelative = true;  // Start in field-relative mode
     bool m_emergencyStop = false; // Emergency stop state
     bool m_calibrationMode = false; // Encoder calibration mode
+
+    // Driver input slew rate limiters (CONFIGURABLE: tune for driver feel)
+    // Units: how fast the command can change (per second)
+    // WPILib SlewRateLimiter in 2025 uses units. We keep doubles here for clarity and
+    // apply the rates manually in code to avoid template friction for students.
+    double m_prevVx = 0.0;
+    double m_prevVy = 0.0;
+    double m_prevOmega = 0.0;
+    double m_lastUpdateSec = 0.0;
+
+    // Field visualization (odometry)
+    frc::Field2d m_field;
     
     /**
      * Handle teleop driving

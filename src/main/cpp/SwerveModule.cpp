@@ -38,12 +38,16 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
         targetPosition = optimizedState.angle / (2.0 * M_PI) * STEER_GEAR_RATIO;
         #endif
         auto ctrl = m_steerMotor->GetClosedLoopController();
+        // Live kP tuning from dashboard (CONFIGURABLE) — if API lacks SetP here, keep default
+        double kP = frc::SmartDashboard::GetNumber("Steer kP", STEER_P_GAIN);
+        (void)kP; // avoid unused if controller doesn't expose SetP in this build
         ctrl.SetReference(targetPosition, rev::spark::SparkMax::ControlType::kPosition);
     }
     #else
     {
         double angleError = constrainAngle(optimizedState.angle - currentAngle);
-        double steerCmd = STEER_P_GAIN * angleError; // unitless output
+        double kP = frc::SmartDashboard::GetNumber("Steer kP", STEER_P_GAIN);
+        double steerCmd = kP * angleError; // unitless output
         if (steerCmd > 1.0) steerCmd = 1.0;
         if (steerCmd < -1.0) steerCmd = -1.0;
         m_steerMotor->Set(steerCmd);

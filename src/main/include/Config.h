@@ -71,6 +71,14 @@ constexpr double STEER_P_GAIN = 2.0;        // Simple P control for steering (un
 #define USE_ONBOARD_STEER_PID 1
 
 // =============================================================================
+// INPUT SLEW RATES (tune for driver feel)
+// =============================================================================
+
+constexpr double SLEW_RATE_VX = 3.0;     // m/s per second
+constexpr double SLEW_RATE_VY = 3.0;     // m/s per second
+constexpr double SLEW_RATE_OMEGA = 6.0;  // rad/s per second
+
+// =============================================================================
 // ENCODER OFFSETS (radians) - set after calibration
 // =============================================================================
 
