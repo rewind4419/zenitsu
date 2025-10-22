@@ -25,6 +25,15 @@ Drivetrain::Drivetrain() {
         m_moduleTranslations[2],
         m_moduleTranslations[3]
     );
+
+    // Initialize odometry at origin (guarded; can be used when gyro present)
+    m_pose = frc::Pose2d{};
+    m_odometry = new frc::SwerveDriveOdometry<4>(
+        *m_kinematics,
+        frc::Rotation2d{units::radian_t{0.0}},
+        getModulePositions(),
+        m_pose
+    );
 }
 
 void Drivetrain::drive(const ChassisSpeed& speeds) {
@@ -68,6 +77,17 @@ std::array<double, 4> Drivetrain::getWheelPositions() const {
     return positions;
 }
 
+std::array<frc::SwerveModulePosition, 4> Drivetrain::getModulePositions() const {
+    std::array<frc::SwerveModulePosition, 4> positions;
+    for (size_t i = 0; i < 4; i++) {
+        positions[i] = frc::SwerveModulePosition{
+            units::meter_t{m_modules[i]->getDrivePosition()},
+            frc::Rotation2d{units::radian_t{m_modules[i]->getCurrentState().angle}}
+        };
+    }
+    return positions;
+}
+
 std::array<double, 4> Drivetrain::getRawModuleAngles() const {
     std::array<double, 4> angles;
     for (size_t i = 0; i < 4; i++) {
@@ -94,6 +114,25 @@ void Drivetrain::updateTelemetry() {
     frc::SmartDashboard::PutNumber("FR Angle", radiansToDegrees(states[1].angle));
     frc::SmartDashboard::PutNumber("BL Angle", radiansToDegrees(states[2].angle));
     frc::SmartDashboard::PutNumber("BR Angle", radiansToDegrees(states[3].angle));
+}
+
+void Drivetrain::resetOdometry(const frc::Pose2d& pose) {
+    if (m_odometry == nullptr) return;
+    m_pose = pose;
+    m_odometry->ResetPosition(
+        frc::Rotation2d{units::radian_t{0.0}},
+        getModulePositions(),
+        m_pose
+    );
+}
+
+frc::Pose2d Drivetrain::updateOdometry(double gyroAngleRadians) {
+    if (m_odometry == nullptr) return m_pose;
+    m_pose = m_odometry->Update(
+        frc::Rotation2d{units::radian_t{gyroAngleRadians}},
+        getModulePositions()
+    );
+    return m_pose;
 }
 
 std::array<SwerveModuleState, 4> Drivetrain::calculateModuleStates(const ChassisSpeed& speeds) const {

@@ -7,9 +7,13 @@
 #include "MathUtils.h"
 
 #include <frc/geometry/Translation2d.h>
+#include <frc/geometry/Rotation2d.h>
+#include <frc/geometry/Pose2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveModuleState.h>
+#include <frc/kinematics/SwerveModulePosition.h>
+#include <frc/kinematics/SwerveDriveOdometry.h>
 
 /**
  * Clean swerve drivetrain implementation
@@ -50,6 +54,11 @@ public:
     std::array<double, 4> getWheelPositions() const;
 
     /**
+     * Get module positions for odometry
+     */
+    std::array<frc::SwerveModulePosition, 4> getModulePositions() const;
+
+    /**
      * Raw absolute angles from CANcoders (no offsets), radians
      */
     std::array<double, 4> getRawModuleAngles() const;
@@ -64,6 +73,13 @@ public:
      */
     void updateTelemetry();
 
+    /**
+     * Odometry helpers
+     */
+    void resetOdometry(const frc::Pose2d& pose);
+    frc::Pose2d updateOdometry(double gyroAngleRadians);
+    frc::Pose2d getPose() const { return m_pose; }
+
 private:
     // Swerve modules: Front-Left, Front-Right, Back-Left, Back-Right
     std::array<std::unique_ptr<SwerveModule>, 4> m_modules;
@@ -71,6 +87,10 @@ private:
     // WPILib swerve kinematics
     frc::SwerveDriveKinematics<4>* m_kinematics = nullptr;
     std::array<frc::Translation2d, 4> m_moduleTranslations; // FL, FR, BL, BR
+
+    // WPILib odometry
+    frc::SwerveDriveOdometry<4>* m_odometry = nullptr;
+    frc::Pose2d m_pose;
     
     /**
      * Convert chassis speeds to individual module states
