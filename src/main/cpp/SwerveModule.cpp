@@ -18,20 +18,22 @@ SwerveModule::SwerveModule(int driveMotorId, int steerMotorId, int encoderId, do
 
 void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
     // Get current angle
-    double currentAngle = getAbsoluteAngle();
-    
+    const double currentAngle = getAbsoluteAngle();
+
     // Optimize the state to avoid spinning more than 90 degrees
-    SwerveModuleState optimizedState = optimizeState(desiredState, currentAngle);
-    
-    // Set drive motor speed
-    double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;  // Normalize to -1 to 1
+    const SwerveModuleState optimizedState = optimizeState(desiredState, currentAngle);
+
+    // Drive output normalized -1..1
+    const double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;
     m_driveMotor->Set(driveOutput);
-    
-    // Set steering motor position (simplified for now)
-    // TODO: Implement proper PID position control once API is verified
-    double steerOutput = optimizedState.angle / (2 * M_PI);  // Convert to rotations
-    m_steerMotor->Set(steerOutput);
-    
+
+    // Simple P control for steering in radians (keeps dependencies minimal)
+    double angleError = constrainAngle(optimizedState.angle - currentAngle);
+    double steerCmd = STEER_P_GAIN * angleError; // unitless output
+    if (steerCmd > 1.0) steerCmd = 1.0;
+    if (steerCmd < -1.0) steerCmd = -1.0;
+    m_steerMotor->Set(steerCmd);
+
     m_lastAngle = optimizedState.angle;
 }
 
@@ -64,6 +66,10 @@ double SwerveModule::getAbsoluteAngle() const {
     return constrainAngle(rawAngle - m_encoderOffset);
 }
 
+double SwerveModule::getRawAbsoluteAngle() const {
+    return m_encoder->GetAbsolutePosition().GetValue().value() * 2.0 * M_PI;
+}
+
 SwerveModuleState SwerveModule::optimizeState(const SwerveModuleState& desiredState, double currentAngle) const {
     double targetAngle = constrainAngle(desiredState.angle);
     double delta = constrainAngle(targetAngle - currentAngle);
@@ -83,13 +89,24 @@ SwerveModuleState SwerveModule::optimizeState(const SwerveModuleState& desiredSt
 }
 
 void SwerveModule::configureMotors() {
-    // Basic motor configuration - use simple setup for now
-    // Advanced configuration can be added once we verify the 2025 API methods
-    
-    // Reset encoders to zero
-    m_driveMotor->GetEncoder().SetPosition(0.0);
-    m_steerMotor->GetEncoder().SetPosition(0.0);
-    
-    // Note: Advanced motor configuration (current limits, PID, brake mode) 
-    // will be added once we verify the correct 2025 REV API methods
+    // Idle mode and current limits
+    // Note: If your installed REV API differs, adjust these calls accordingly.
+    // Fallback: if these symbols differ in your vendor library, keep default settings.
+    // (Leaving these here as best-effort; safe to compile on stock 2025 libs.)
+    // m_driveMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
+    // m_steerMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
+    // m_driveMotor->SetSmartCurrentLimit(40);
+    // m_steerMotor->SetSmartCurrentLimit(20);
+
+    // Conversion factors for student-friendly units
+    const double driveCF = (WHEEL_RADIUS * 2.0 * M_PI) / DRIVE_GEAR_RATIO; // rotations → meters
+    // If conversion factor APIs are present, prefer them; otherwise keep manual math elsewhere
+    // m_driveMotor->GetEncoder().SetPositionConversionFactor(driveCF);
+    // m_driveMotor->GetEncoder().SetVelocityConversionFactor(driveCF / 60.0);
+
+    const double steerCF = (2.0 * M_PI) / STEER_GEAR_RATIO; // rotations → radians
+    // m_steerMotor->GetEncoder().SetPositionConversionFactor(steerCF);
+
+    // Seed steer encoder to current absolute angle (with offset)
+    m_steerMotor->GetEncoder().SetPosition(getAbsoluteAngle());
 }

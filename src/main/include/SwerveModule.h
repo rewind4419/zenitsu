@@ -50,6 +50,11 @@ public:
      */
     void stop();
 
+    /**
+     * Raw absolute angle from CANcoder without offset, radians (0..2π)
+     */
+    double getRawAbsoluteAngle() const;
+
 private:
     // Hardware
     std::unique_ptr<rev::spark::SparkMax> m_driveMotor;

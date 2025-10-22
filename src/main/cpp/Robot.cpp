@@ -216,11 +216,11 @@ void Robot::handleCalibration() {
     frc::SmartDashboard::PutString("Instructions3", "3. Update Config.h with these offset values");
     frc::SmartDashboard::PutString("Instructions4", "4. Exit calibration mode when done");
     
-    // Display current raw encoder positions
-    // These values should be used as encoder offsets in Config.h
-    printf("⚡ CALIBRATION - Current encoder positions (use as offsets):\n");
-    printf("   Front Left:  %.3f\n", 0.0); // Would read actual encoder here
-    printf("   Front Right: %.3f\n", 0.0);
-    printf("   Back Left:   %.3f\n", 0.0);
-    printf("   Back Right:  %.3f\n", 0.0);
+    // Display current raw encoder positions (radians) for copy/paste
+    auto raw = m_drivetrain->getRawModuleAngles();
+    printf("⚡ CALIBRATION - Use these as offsets in Config.h (radians):\n");
+    printf("   FRONT_LEFT_ENCODER_OFFSET  = %.6f\n", raw[0]);
+    printf("   FRONT_RIGHT_ENCODER_OFFSET = %.6f\n", raw[1]);
+    printf("   BACK_LEFT_ENCODER_OFFSET   = %.6f\n", raw[2]);
+    printf("   BACK_RIGHT_ENCODER_OFFSET  = %.6f\n", raw[3]);
 }

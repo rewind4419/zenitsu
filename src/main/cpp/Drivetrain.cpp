@@ -7,10 +7,10 @@
 Drivetrain::Drivetrain() {
     // Create swerve modules with their respective IDs and encoder offsets
     // Note: Encoder offsets would need to be calibrated for each robot
-    m_modules[0] = std::make_unique<SwerveModule>(FRONT_LEFT_DRIVE_ID, FRONT_LEFT_STEER_ID, FRONT_LEFT_ENCODER_ID, 0.0);
-    m_modules[1] = std::make_unique<SwerveModule>(FRONT_RIGHT_DRIVE_ID, FRONT_RIGHT_STEER_ID, FRONT_RIGHT_ENCODER_ID, 0.0);
-    m_modules[2] = std::make_unique<SwerveModule>(BACK_LEFT_DRIVE_ID, BACK_LEFT_STEER_ID, BACK_LEFT_ENCODER_ID, 0.0);
-    m_modules[3] = std::make_unique<SwerveModule>(BACK_RIGHT_DRIVE_ID, BACK_RIGHT_STEER_ID, BACK_RIGHT_ENCODER_ID, 0.0);
+    m_modules[0] = std::make_unique<SwerveModule>(FRONT_LEFT_DRIVE_ID, FRONT_LEFT_STEER_ID, FRONT_LEFT_ENCODER_ID, FRONT_LEFT_ENCODER_OFFSET);
+    m_modules[1] = std::make_unique<SwerveModule>(FRONT_RIGHT_DRIVE_ID, FRONT_RIGHT_STEER_ID, FRONT_RIGHT_ENCODER_ID, FRONT_RIGHT_ENCODER_OFFSET);
+    m_modules[2] = std::make_unique<SwerveModule>(BACK_LEFT_DRIVE_ID, BACK_LEFT_STEER_ID, BACK_LEFT_ENCODER_ID, BACK_LEFT_ENCODER_OFFSET);
+    m_modules[3] = std::make_unique<SwerveModule>(BACK_RIGHT_DRIVE_ID, BACK_RIGHT_STEER_ID, BACK_RIGHT_ENCODER_ID, BACK_RIGHT_ENCODER_OFFSET);
     
     initializeModulePositions();
 }
@@ -54,6 +54,14 @@ std::array<double, 4> Drivetrain::getWheelPositions() const {
         positions[i] = m_modules[i]->getDrivePosition();
     }
     return positions;
+}
+
+std::array<double, 4> Drivetrain::getRawModuleAngles() const {
+    std::array<double, 4> angles;
+    for (size_t i = 0; i < 4; i++) {
+        angles[i] = m_modules[i]->getRawAbsoluteAngle();
+    }
+    return angles;
 }
 
 void Drivetrain::resetEncoders() {

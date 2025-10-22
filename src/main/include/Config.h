@@ -62,6 +62,35 @@ constexpr double NORMAL_TURN_SPEED = 0.8;    // Normal turning multiplier
 constexpr double CONTROLLER_TIMEOUT = 0.5;  // Controller disconnect timeout (seconds)
 
 // =============================================================================
+// CONTROL GAINS (steer P controller)
+// =============================================================================
+
+constexpr double STEER_P_GAIN = 2.0;        // Simple P control for steering (unit: output/radian)
+
+// =============================================================================
+// ENCODER OFFSETS (radians) - set after calibration
+// =============================================================================
+
+constexpr double FRONT_LEFT_ENCODER_OFFSET  = 0.0;
+constexpr double FRONT_RIGHT_ENCODER_OFFSET = 0.0;
+constexpr double BACK_LEFT_ENCODER_OFFSET   = 0.0;
+constexpr double BACK_RIGHT_ENCODER_OFFSET  = 0.0;
+
+// =============================================================================
+// PLAYSTATION CONTROLLER MAPPING
+// =============================================================================
+
+constexpr int PS_AXIS_LEFT_X   = 0;
+constexpr int PS_AXIS_LEFT_Y   = 1;
+constexpr int PS_AXIS_RIGHT_X  = 2;
+
+constexpr int PS_BTN_L1        = 5;
+constexpr int PS_BTN_R1        = 6;
+constexpr int PS_BTN_SHARE     = 9;
+constexpr int PS_BTN_OPTIONS   = 10;
+constexpr int PS_BTN_PS        = 14;
+
+// =============================================================================
 // SENSOR CONFIGURATION
 // =============================================================================
 

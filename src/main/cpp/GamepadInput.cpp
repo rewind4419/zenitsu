@@ -9,9 +9,9 @@ GamepadInput::GamepadInput(int controllerPort) {
 
 void GamepadInput::update() {
     // Get raw stick values using PlayStation DualShock axis mapping
-    double rawX = m_controller->GetRawAxis(0);      // Left stick X
-    double rawY = -m_controller->GetRawAxis(1);     // Left stick Y (inverted)
-    double rawRotation = m_controller->GetRawAxis(2); // Right stick X (PlayStation uses axis 2)
+    double rawX = m_controller->GetRawAxis(PS_AXIS_LEFT_X);
+    double rawY = -m_controller->GetRawAxis(PS_AXIS_LEFT_Y);     // inverted
+    double rawRotation = m_controller->GetRawAxis(PS_AXIS_RIGHT_X);
     
     // Apply deadband
     rawX = applyDeadband(rawX, JOYSTICK_DEADBAND);
@@ -28,13 +28,13 @@ void GamepadInput::update() {
     m_rotation = squareInput(rawRotation);
     
     // Update button states using PlayStation DualShock button mapping
-    m_precisionMode = m_controller->GetRawButton(5);  // L1 (left bumper)
-    m_turboMode = m_controller->GetRawButton(6);      // R1 (right bumper)
+    m_precisionMode = m_controller->GetRawButton(PS_BTN_L1);
+    m_turboMode = m_controller->GetRawButton(PS_BTN_R1);
     
     // Update PlayStation-specific buttons
-    m_shareButton = m_controller->GetRawButton(9);    // Share button
-    m_optionsButton = m_controller->GetRawButton(10); // Options button
-    m_psButton = m_controller->GetRawButton(14);      // PlayStation button
+    m_shareButton = m_controller->GetRawButton(PS_BTN_SHARE);
+    m_optionsButton = m_controller->GetRawButton(PS_BTN_OPTIONS);
+    m_psButton = m_controller->GetRawButton(PS_BTN_PS);
     
     // Update safety timestamp
     m_lastControllerUpdate = frc::Timer::GetFPGATimestamp().value();
@@ -81,6 +81,5 @@ bool GamepadInput::getPSButton() const {
 }
 
 bool GamepadInput::isControllerConnected() const {
-    double currentTime = frc::Timer::GetFPGATimestamp().value();
-    return (currentTime - m_lastControllerUpdate) < CONTROLLER_TIMEOUT;
+    return m_controller->IsConnected();
 }

@@ -43,6 +43,11 @@ public:
      * @return Array of drive wheel positions in meters [FL, FR, BL, BR]
      */
     std::array<double, 4> getWheelPositions() const;
+
+    /**
+     * Raw absolute angles from CANcoders (no offsets), radians
+     */
+    std::array<double, 4> getRawModuleAngles() const;
     
     /**
      * Reset drive encoders to zero
