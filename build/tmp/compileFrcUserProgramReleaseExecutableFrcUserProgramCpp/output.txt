@@ -1,0 +1,298 @@
+See file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramReleaseExecutableFrcUserProgramCpp/output.txt for all output for compileFrcUserProgramReleaseExecutableFrcUserProgramCpp.
+compiling pid.cpp successful.
+
+compiling maths.cpp successful.
+
+compiling drivetrain.cpp failed.
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:1:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:13:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   13 |     rev::SparkMax* drive_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:14:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   14 |     rev::SparkMax* steer_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:15:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   15 |     rev::SparkRelativeEncoder* steer_encoder; // relative encoder
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:16:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   16 |     rev::SparkRelativeEncoder* drive_encoder;
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp: In function 'void initDrivetrain(Drivetrain*)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:24:8: error: 'struct SwerveDriveModule' has no member named 'drive_motor'
+   24 |     fl.drive_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_DRIVE_MOTOR_FL);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:25:8: error: 'struct SwerveDriveModule' has no member named 'steer_motor'
+   25 |     fl.steer_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_STEER_MOTOR_FL);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:33:8: error: 'struct SwerveDriveModule' has no member named 'drive_motor'
+   33 |     fr.drive_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_DRIVE_MOTOR_FR);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:34:8: error: 'struct SwerveDriveModule' has no member named 'steer_motor'
+   34 |     fr.steer_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_STEER_MOTOR_FR);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:42:8: error: 'struct SwerveDriveModule' has no member named 'drive_motor'
+   42 |     bl.drive_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_DRIVE_MOTOR_BL);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:43:8: error: 'struct SwerveDriveModule' has no member named 'steer_motor'
+   43 |     bl.steer_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_STEER_MOTOR_BL);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:51:8: error: 'struct SwerveDriveModule' has no member named 'drive_motor'
+   51 |     br.drive_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_DRIVE_MOTOR_BR);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:52:8: error: 'struct SwerveDriveModule' has no member named 'steer_motor'
+   52 |     br.steer_motor       = NEW_SPARK_MAX(CFG_CAN_DRIVETRAIN_STEER_MOTOR_BR);
+      |        ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: error: expected type-specifier
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:18:32: note: in definition of macro 'NEW_SPARK_MAX'
+   18 | #define NEW_SPARK_MAX(can) new rev::SparkMax(can, rev::SparkMaxLowLevel::MotorType::kBrushless)
+      |                                ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:66:17: error: 'struct SwerveDriveModule' has no member named 'steer_encoder'
+   66 |         module->steer_encoder = new rev::SparkRelativeEncoder(module->steer_motor->GetEncoder());
+      |                 ^~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:66:37: error: expected type-specifier
+   66 |         module->steer_encoder = new rev::SparkRelativeEncoder(module->steer_motor->GetEncoder());
+      |                                     ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:67:17: error: 'struct SwerveDriveModule' has no member named 'drive_encoder'; did you mean 'direction_encoder'?
+   67 |         module->drive_encoder = new rev::SparkRelativeEncoder(module->drive_motor->GetEncoder());
+      |                 ^~~~~~~~~~~~~
+      |                 direction_encoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:67:37: error: expected type-specifier
+   67 |         module->drive_encoder = new rev::SparkRelativeEncoder(module->drive_motor->GetEncoder());
+      |                                     ^~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:80:17: error: 'struct SwerveDriveModule' has no member named 'steer_encoder'
+   80 |         module->steer_encoder->SetPosition(0);
+      |                 ^~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:81:17: error: 'struct SwerveDriveModule' has no member named 'drive_encoder'; did you mean 'direction_encoder'?
+   81 |         module->drive_encoder->SetPosition(0);
+      |                 ^~~~~~~~~~~~~
+      |                 direction_encoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp: In function 'void drivetrainUpdateRawVectors(Drivetrain*, v2*, float, bool)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:124:40: error: 'struct SwerveDriveModule' has no member named 'steer_encoder'
+  124 |         float steerRotation = -module->steer_encoder->GetPosition() / CFG_DRIVETRAIN_STEER_RATIO * (M_PI * 2);
+      |                                        ^~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:175:17: error: 'struct SwerveDriveModule' has no member named 'steer_motor'
+  175 |         module->steer_motor->Set( steer_throttle);
+      |                 ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:201:17: error: 'struct SwerveDriveModule' has no member named 'drive_motor'
+  201 |         module->drive_motor->Set(drive_throttle);
+      |                 ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp: In function 'OdometryFrame getDrivetrainOdometry(Drivetrain*)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.cpp:235:39: error: 'struct SwerveDriveModule' has no member named 'drive_encoder'; did you mean 'direction_encoder'?
+  235 |         float drivePosition = module->drive_encoder->GetPosition();
+      |                                       ^~~~~~~~~~~~~
+      |                                       direction_encoder
+
+compiling localiser.cpp failed.
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.h:4,
+                 from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp:1:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:13:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   13 |     rev::SparkMax* drive_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:14:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   14 |     rev::SparkMax* steer_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:15:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   15 |     rev::SparkRelativeEncoder* steer_encoder; // relative encoder
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:16:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   16 |     rev::SparkRelativeEncoder* drive_encoder;
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp:2:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../Robot.h:99:5: error: 'Studica' does not name a type
+   99 |     Studica::AHRS* sensor_imu = nullptr;
+      |     ^~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp: In function 'bool tagIdExists(std::vector<TagPosition>, int)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp:102:20: warning: comparison of integer expressions of different signedness: 'int' and 'std::vector<TagPosition>::size_type' {aka 'unsigned int'} [-Wsign-compare]
+  102 |   for(int i = 0; i < tag_vector.size(); i++)
+      |                  ~~^~~~~~~~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp: In function 'void stepLocaliser(RobotData*)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp:114:40: error: 'struct RobotData' has no member named 'sensor_imu'
+  114 |   float imu_rotation = degToRad(robot->sensor_imu->GetYaw());
+      |                                        ^~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/localiser.cpp:135:21: warning: comparison of integer expressions of different signedness: 'int' and 'std::vector<TagPosition>::size_type' {aka 'unsigned int'} [-Wsign-compare]
+  135 |   for (int i = 0; i < robot->photon.global_tags.size(); i++)
+      |                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+compiling gamepad.cpp successful.
+
+compiling Robot.cpp failed.
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.h:17,
+                 from /Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:1:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:13:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   13 |     rev::SparkMax* drive_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:14:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   14 |     rev::SparkMax* steer_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:15:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   15 |     rev::SparkRelativeEncoder* steer_encoder; // relative encoder
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:16:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   16 |     rev::SparkRelativeEncoder* drive_encoder;
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.h:99:5: error: 'Studica' does not name a type
+   99 |     Studica::AHRS* sensor_imu = nullptr;
+      |     ^~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp: In function 'void initRobot(RobotData*, RobotMode)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:24:8: error: 'struct RobotData' has no member named 'sensor_imu'
+   24 |     r->sensor_imu = new Studica::AHRS(frc::SPI::Port::kMXP);
+      |        ^~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:24:25: error: 'Studica' does not name a type
+   24 |     r->sensor_imu = new Studica::AHRS(frc::SPI::Port::kMXP);
+      |                         ^~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:25:8: error: 'struct RobotData' has no member named 'sensor_imu'
+   25 |     r->sensor_imu->ZeroYaw();
+      |        ^~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp: In function 'void robotModeInit(RobotData*, RobotMode)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:52:12: error: 'struct RobotData' has no member named 'sensor_imu'
+   52 |     robot->sensor_imu->ZeroYaw();
+      |            ^~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp: In function 'void updateRobot(RobotData*, float, RobotMode)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:113:29: error: 'struct GamepadInput' has no member named 'button_left_bumper'
+  113 |         if (r->input.driver.button_left_bumper.held) {
+      |                             ^~~~~~~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:115:36: error: 'struct GamepadInput' has no member named 'button_right_bumper'
+  115 |         } else if (r->input.driver.button_right_bumper.held) {
+      |                                    ^~~~~~~~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:121:29: error: 'struct GamepadInput' has no member named 'stick_left'; did you mean 'joystick_left'?
+  121 |             r->input.driver.stick_left.x * speed_multiplier,
+      |                             ^~~~~~~~~~
+      |                             joystick_left
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:122:29: error: 'struct GamepadInput' has no member named 'stick_left'; did you mean 'joystick_left'?
+  122 |             r->input.driver.stick_left.y * speed_multiplier
+      |                             ^~~~~~~~~~
+      |                             joystick_left
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:126:42: error: 'struct GamepadInput' has no member named 'stick_right'; did you mean 'joystick_right'?
+  126 |         float rotation = r->input.driver.stick_right.x * CFG_DRIVER_SPEED_NORMAL_ROT;
+      |                                          ^~~~~~~~~~~
+      |                                          joystick_right
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/Robot.cpp:129:39: error: 'struct RobotData' has no member named 'sensor_imu'
+  129 |         float imu_angle = degToRad(r->sensor_imu->GetYaw()) + r->imu_basis;
+      |                                       ^~~~~~~~~~
+
+compiling taskmgr.cpp failed.
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../Robot.h:17,
+                 from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:2:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../fennec/drivetrain.h:13:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   13 |     rev::SparkMax* drive_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../fennec/drivetrain.h:14:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   14 |     rev::SparkMax* steer_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../fennec/drivetrain.h:15:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   15 |     rev::SparkRelativeEncoder* steer_encoder; // relative encoder
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../fennec/drivetrain.h:16:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   16 |     rev::SparkRelativeEncoder* drive_encoder;
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../Robot.h:99:5: error: 'Studica' does not name a type
+   99 |     Studica::AHRS* sensor_imu = nullptr;
+      |     ^~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp: In function 'bool taskStep(Task*, RobotData*)':
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:439:32: error: 'struct SimplifiedShooter' has no member named 'firing_motor_speed'; did you mean 'firing_motor_task'?
+  439 |                 robot->shooter.firing_motor_speed = -CFG_SHOOTER_MAX_FIRING_SPEED;
+      |                                ^~~~~~~~~~~~~~~~~~
+      |                                firing_motor_task
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:442:40: error: 'struct SimplifiedShooter' has no member named 'firing_motor_speed'; did you mean 'firing_motor_task'?
+  442 |                         robot->shooter.firing_motor_speed *= task->firing_motor.direction;
+      |                                        ^~~~~~~~~~~~~~~~~~
+      |                                        firing_motor_task
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:454:32: error: 'struct SimplifiedShooter' has no member named 'firing_motor_speed'; did you mean 'firing_motor_task'?
+  454 |                 robot->shooter.firing_motor_speed = 0;
+      |                                ^~~~~~~~~~~~~~~~~~
+      |                                firing_motor_task
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:459:32: error: 'struct SimplifiedShooter' has no member named 'shooter_first_time'
+  459 |                 robot->shooter.shooter_first_time = true;
+      |                                ^~~~~~~~~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:469:83: error: 'struct SimplifiedShooter' has no member named 'firing_motor_speed'; did you mean 'firing_motor_task'?
+  469 |                         task->shooter.seat_prior_firing_throttle = robot->shooter.firing_motor_speed;
+      |                                                                                   ^~~~~~~~~~~~~~~~~~
+      |                                                                                   firing_motor_task
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:478:32: error: 'struct SimplifiedShooter' has no member named 'intake_task'
+  478 |                 robot->shooter.intake_task = false;
+      |                                ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:502:32: error: 'struct SimplifiedShooter' has no member named 'intake_task'
+  502 |                 robot->shooter.intake_task = false;
+      |                                ^~~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:517:17: error: 'alignToTag' was not declared in this scope
+  517 |                 alignToTag(task->photon_aligner.align_tag_id, robot, true);
+      |                 ^~~~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/taskmgr.cpp:594:23: warning: unused variable 'solved_angle_after_regression_function' [-Wunused-variable]
+  594 |                 float solved_angle_after_regression_function = 0.878567 * solved_shooter_angle + 0.158185;
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+compiling drivetrain_controller.cpp failed.
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain_controller.h:4,
+                 from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain_controller.cpp:1:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:13:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   13 |     rev::SparkMax* drive_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:14:10: error: 'SparkMax' in namespace 'rev' does not name a type
+   14 |     rev::SparkMax* steer_motor;
+      |          ^~~~~~~~
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:15:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   15 |     rev::SparkRelativeEncoder* steer_encoder; // relative encoder
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain.h:16:10: error: 'SparkRelativeEncoder' in namespace 'rev' does not name a type; did you mean 'RelativeEncoder'?
+   16 |     rev::SparkRelativeEncoder* drive_encoder;
+      |          ^~~~~~~~~~~~~~~~~~~~
+      |          RelativeEncoder
+In file included from /Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/drivetrain_controller.cpp:4:
+/Users/alwatson/Downloads/zenitsu/src/main/cpp/fennec/../Robot.h:99:5: error: 'Studica' does not name a type
+   99 |     Studica::AHRS* sensor_imu = nullptr;
+      |     ^~~~~~~
+
+Finished compileFrcUserProgramReleaseExecutableFrcUserProgramCpp, see full log file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramReleaseExecutableFrcUserProgramCpp/output.txt.
