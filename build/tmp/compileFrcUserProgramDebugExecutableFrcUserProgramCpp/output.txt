@@ -1,24 +1,9 @@
 See file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt for all output for compileFrcUserProgramDebugExecutableFrcUserProgramCpp.
 compiling GamepadInput.cpp successful.
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp: In member function 'void GamepadInput::update()':
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:29:50: warning: 'bool frc::XboxController::GetLeftBumper() const' is deprecated: Use GetLeftBumperButton instead [-Wdeprecated-declarations]
-   29 |     m_precisionMode = m_controller->GetLeftBumper();
-      |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
-In file included from /Users/alwatson/Downloads/zenitsu/src/main/include/GamepadInput.h:3,
-                 from /Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:1:
-/Users/alwatson/.gradle/caches/8.10/transforms/8868b7dee6c89fd90ec805da0c828ee4/transformed/wpilibc-cpp-2025.3.2-headers/frc/XboxController.h:454:8: note: declared here
-  454 |   bool GetLeftBumper() const;
-      |        ^~~~~~~~~~~~~
-/Users/alwatson/Downloads/zenitsu/src/main/cpp/GamepadInput.cpp:30:47: warning: 'bool frc::XboxController::GetRightBumper() const' is deprecated: Use GetRightBumperButton instead [-Wdeprecated-declarations]
-   30 |     m_turboMode = m_controller->GetRightBumper();
-      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
-/Users/alwatson/.gradle/caches/8.10/transforms/8868b7dee6c89fd90ec805da0c828ee4/transformed/wpilibc-cpp-2025.3.2-headers/frc/XboxController.h:465:8: note: declared here
-  465 |   bool GetRightBumper() const;
-      |        ^~~~~~~~~~~~~~
-
-compiling SwerveModule.cpp successful.
 
 compiling Drivetrain.cpp successful.
+
+compiling SwerveModule.cpp successful.
 
 compiling Robot.cpp successful.
 

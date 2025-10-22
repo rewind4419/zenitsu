@@ -56,8 +56,17 @@ constexpr double TURBO_DRIVE_SPEED = 1.0;    // Turbo/fast mode
 constexpr double NORMAL_TURN_SPEED = 0.8;    // Normal turning multiplier
 
 // =============================================================================
-// CONTROLLER CONFIGURATION  
+// CONTROLLER CONFIGURATION (PlayStation DualShock)
 // =============================================================================
 
 constexpr int DRIVER_CONTROLLER_PORT = 0;
 constexpr double JOYSTICK_DEADBAND = 0.1;    // Ignore inputs smaller than this
+
+// PlayStation DualShock Controller Layout:
+// - Left stick: Drive translation (forward/back, left/right)
+// - Right stick: Rotation (left/right only)
+// - L1 (button 5): Precision mode (slow, careful driving)
+// - R1 (button 6): Turbo mode (fast driving)
+// - Share (button 9): Available for custom functions
+// - Options (button 10): Available for custom functions  
+// - PS Button (button 14): Available for custom functions

@@ -16,7 +16,7 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
     frc::SmartDashboard::PutString("Robot State", "Initialized");
     
-    printf("🗾⚡ Zenitsu Robot Initialized! Ready for lightning-fast swerve driving!\n");
+    printf("🗾⚡ Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
 }
 
 void Robot::RobotPeriodic() {
@@ -81,14 +81,15 @@ void Robot::handleTeleopDrive() {
         m_drivetrain->drive(speeds);
     }
     
-    // Toggle field-relative mode with A button (example - can be customized)
-    static bool lastAButton = false;
-    bool currentAButton = false;  // m_controller->GetAButton() if you want this feature
-    if (currentAButton && !lastAButton) {
+    // Toggle field-relative mode with Share button (PlayStation-specific)
+    static bool lastShareButton = false;
+    bool currentShareButton = m_gamepadInput->getShareButton();
+    if (currentShareButton && !lastShareButton) {
         m_fieldRelative = !m_fieldRelative;
         frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
+        printf("⚡ Field-relative mode %s\n", m_fieldRelative ? "ENABLED" : "DISABLED");
     }
-    lastAButton = currentAButton;
+    lastShareButton = currentShareButton;
 }
 
 void Robot::updateDashboard() {
@@ -101,8 +102,12 @@ void Robot::updateDashboard() {
     frc::SmartDashboard::PutNumber("Drive Y", translation.y);
     frc::SmartDashboard::PutNumber("Rotation", m_gamepadInput->getRotation());
     
-    // Update control mode info
-    frc::SmartDashboard::PutBoolean("Precision Mode", m_gamepadInput->isPrecisionMode());
-    frc::SmartDashboard::PutBoolean("Turbo Mode", m_gamepadInput->isTurboMode());
+    // Update control mode info (PlayStation controller)
+    frc::SmartDashboard::PutBoolean("Precision Mode (L1)", m_gamepadInput->isPrecisionMode());
+    frc::SmartDashboard::PutBoolean("Turbo Mode (R1)", m_gamepadInput->isTurboMode());
     frc::SmartDashboard::PutNumber("Speed Multiplier", m_gamepadInput->getSpeedMultiplier());
+    
+    // PlayStation-specific button states
+    frc::SmartDashboard::PutBoolean("Share Button", m_gamepadInput->getShareButton());
+    frc::SmartDashboard::PutBoolean("Options Button", m_gamepadInput->getOptionsButton());
 }
