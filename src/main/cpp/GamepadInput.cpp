@@ -30,7 +30,6 @@ void GamepadInput::update() {
     // Update button states using PlayStation DualShock button mapping
     m_precisionMode = m_controller->GetRawButton(5);  // L1 (left bumper)
     m_turboMode = m_controller->GetRawButton(6);      // R1 (right bumper)
-    m_deadmanSwitch = m_controller->GetRawButton(7);  // L2 (left trigger) - SAFETY
     
     // Update PlayStation-specific buttons
     m_shareButton = m_controller->GetRawButton(9);    // Share button
@@ -79,10 +78,6 @@ bool GamepadInput::getOptionsButton() const {
 
 bool GamepadInput::getPSButton() const {
     return m_psButton;
-}
-
-bool GamepadInput::getDeadmanSwitch() const {
-    return m_deadmanSwitch;
 }
 
 bool GamepadInput::isControllerConnected() const {

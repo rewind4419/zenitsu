@@ -19,9 +19,9 @@ void Robot::RobotInit() {
     frc::SmartDashboard::PutBoolean("Calibration Mode", m_calibrationMode);
     frc::SmartDashboard::PutString("Robot State", "Initialized");
     
-    printf("🗾⚡ Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
-    printf("⚡ NavX gyroscope connected for field-relative driving\n");
+    printf("🗾⚡ Zenitsu Robot Initialized!\n");
     printf("⚡ Press L1+R1+Options to enter calibration mode\n");
+    printf("⚡ Press PS button for emergency stop\n");
 }
 
 void Robot::RobotPeriodic() {
@@ -47,7 +47,7 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
     frc::SmartDashboard::PutString("Robot State", "Teleop");
     
-    printf("⚡ Zenitsu entering teleop mode - Thunder Breathing activated!\n");
+    printf("⚡ Zenitsu entering teleop mode\n");
 }
 
 void Robot::TeleopPeriodic() {
@@ -90,7 +90,6 @@ void Robot::DisabledPeriodic() {
 
 void Robot::handleTeleopDrive() {
     // Safety checks
-    bool deadmanActive = m_gamepadInput->getDeadmanSwitch();
     bool controllerConnected = m_gamepadInput->isControllerConnected();
     
     // Handle emergency stop
@@ -104,7 +103,7 @@ void Robot::handleTeleopDrive() {
     lastPSButton = currentPSButton;
     
     // Stop if safety conditions not met
-    if (m_emergencyStop || !controllerConnected || (REQUIRE_DEADMAN_SWITCH && !deadmanActive)) {
+    if (m_emergencyStop || !controllerConnected) {
         m_drivetrain->stop();
         return;
     }
@@ -171,7 +170,6 @@ void Robot::updateDashboard() {
     
     // Update safety status
     frc::SmartDashboard::PutBoolean("Controller Connected", m_gamepadInput->isControllerConnected());
-    frc::SmartDashboard::PutBoolean("Deadman Switch (L2)", m_gamepadInput->getDeadmanSwitch());
     
     // Update control mode info
     frc::SmartDashboard::PutBoolean("Precision Mode (L1)", m_gamepadInput->isPrecisionMode());

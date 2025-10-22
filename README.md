@@ -37,10 +37,9 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 - **Right Stick**: Rotate robot
 - **L1**: Precision mode (slow, careful driving)
 - **R1**: Turbo mode (fast driving)
-- **L2**: Deadman switch (MUST hold to drive)
 - **Share**: Toggle field-relative mode
 - **Options**: Reset gyroscope
-- **PS Button**: Emergency stop
+- **PS Button**: Emergency stop (terminates all robot functions)
 
 ## 📁 Project Structure
 - `src/main/cpp/` - Source code
@@ -49,19 +48,10 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 - `docs/` - Documentation
 - `Config.h` - Hardware configuration
 
-## 🔧 Key Features
-- ✅ Clean swerve kinematics
-- ✅ PlayStation controller support
-- ✅ NavX gyroscope integration
-- ✅ Field-relative driving
-- ✅ Safety systems (deadman switch, emergency stop)
-- ✅ Encoder calibration system
-- ✅ SmartDashboard telemetry
-
 ## 📚 Documentation
 - [Controller Reference](docs/controller.md)
 - [Calibration Procedures](docs/calibration.md) 
 - [Development Guide](docs/development.md)
 
 ## 🚨 Safety
-This robot requires **L2 (deadman switch) to be held** for all driving operations. Release L2 to immediately stop the robot.
+This robot has an **emergency stop system**. Press the **PS Button** to immediately stop all robot functions. Controller disconnect also stops the robot automatically.
