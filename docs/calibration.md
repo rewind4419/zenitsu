@@ -9,11 +9,12 @@
 2. **Disable robot** and manually align all wheels pointing forward
 3. **Enable robot** - check SmartDashboard for encoder values
 4. **Record the values** for each wheel
-5. **Update Config.h** with the recorded offset values:
+5. **Update Config.h** with the recorded offset values (radians):
    ```cpp
-   constexpr double FRONT_LEFT_ENCODER_OFFSET = YOUR_VALUE;
-   constexpr double FRONT_RIGHT_ENCODER_OFFSET = YOUR_VALUE; 
-   // etc...
+   constexpr double FRONT_LEFT_ENCODER_OFFSET  = YOUR_VALUE;  // radians
+   constexpr double FRONT_RIGHT_ENCODER_OFFSET = YOUR_VALUE;  // radians
+   constexpr double BACK_LEFT_ENCODER_OFFSET   = YOUR_VALUE;  // radians
+   constexpr double BACK_RIGHT_ENCODER_OFFSET  = YOUR_VALUE;  // radians
    ```
 6. **Deploy** and test - wheels should align properly now
 

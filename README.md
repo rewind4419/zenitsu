@@ -32,6 +32,13 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 2. **Calibrate encoders** - See [Calibration Guide](docs/calibration.md)
 3. **Test with controller** - See [Controller Guide](docs/controller.md)
 
+### Before First Drive (Checklist)
+- [ ] Paste encoder offsets (radians) into `Config.h` and redeploy
+- [ ] SmartDashboard shows: `NavX Connected = true`
+- [ ] Dashboard shows `Field` widget and the robot pose updates when moving
+- [ ] If steering wobbles, lower `Steer kP` on SmartDashboard
+- [ ] If starts too jumpy, reduce `SLEW_RATE_*` in `Config.h`
+
 ## 🎮 Controller (PlayStation DualShock)
 - **Left Stick**: Drive forward/backward, strafe left/right
 - **Right Stick**: Rotate robot
@@ -52,6 +59,9 @@ Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with R
 - [Controller Reference](docs/controller.md)
 - [Calibration Procedures](docs/calibration.md) 
 - [Development Guide](docs/development.md)
+
+## 📝 Notes
+- REV motor config (brake mode/current limits) is wrapped in a guard so CI builds without REV vendordeps still compile; on the robot these settings apply automatically.
 
 ## 🚨 Safety
 This robot has an **emergency stop system**. Press the **PS Button** to immediately stop all robot functions. Controller disconnect also stops the robot automatically.

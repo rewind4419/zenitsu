@@ -4,6 +4,7 @@
 - **WPILib 2025** installed
 - **Robot connected** via USB or WiFi
 - **Team number configured** in WPILib
+- **Vendordeps installed**: REVLib, Phoenix6, Studica (NavX)
 
 ## Quick Deploy
 ```bash
@@ -18,11 +19,16 @@
    ./gradlew deploy
    ```
 3. **Calibrate encoders** - see [Calibration Guide](calibration.md)
+4. (Laptop dev) Install toolchain once:
+   ```bash
+   ./gradlew installRoboRioToolchain
+   ```
 
 ## Build Options
 ```bash
 ./gradlew build          # Build only
 ./gradlew deploy         # Build and deploy 
+./gradlew testExternalNativeDebug  # Run native tests
 ```
 
 ## Troubleshooting Deploy
@@ -36,4 +42,5 @@ After successful deploy:
 - [ ] Connect PlayStation controller
 - [ ] Enable robot in teleop
 - [ ] Verify wheels respond to joystick
-- [ ] Check SmartDashboard for sensor data
+- [ ] Check SmartDashboard: `NavX Connected`, `Steer kP`, and the `Field` widget shows pose
+- [ ] PS Button triggers emergency stop
