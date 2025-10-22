@@ -12,13 +12,17 @@ void Robot::RobotInit() {
     m_drivetrain = std::make_unique<Drivetrain>();
     m_gamepadInput = std::make_unique<GamepadInput>(DRIVER_CONTROLLER_PORT);
     
-    // Initialize NavX via Studica library
+    // Initialize NavX via Studica library (if available in this environment)
+    #if NAVX_AVAILABLE
     try {
         m_navx = std::make_unique<studica::AHRS>(studica::AHRS::NavXComType::kMXP_SPI);
         printf("⚡ NavX gyroscope initialized via Studica library\n");
     } catch (std::exception& ex) {
         printf("⚡ NavX initialization failed: %s\n", ex.what());
     }
+    #else
+    printf("⚡ NavX headers not available in this build environment (CI sim). Skipping NavX init.\n");
+    #endif
     
     // Initialize dashboard
     frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
@@ -127,6 +131,7 @@ void Robot::handleTeleopDrive() {
     speeds.omega = rotation * MAX_ANGULAR_SPEED;
     
     // Drive the robot
+    #if NAVX_AVAILABLE
     if (m_fieldRelative && m_navx->IsConnected()) {
         // Use NavX for true field-relative driving
         double gyroAngle = degreesToRadians(m_navx->GetYaw());
@@ -135,6 +140,10 @@ void Robot::handleTeleopDrive() {
         // Robot-relative driving
         m_drivetrain->drive(speeds);
     }
+    #else
+    // Robot-relative driving (NavX not available in this build)
+    m_drivetrain->drive(speeds);
+    #endif
     
     // Toggle field-relative mode with Share button
     static bool lastShareButton = false;
@@ -150,8 +159,12 @@ void Robot::handleTeleopDrive() {
     static bool lastOptionsButton = false;
     bool currentOptionsButton = m_gamepadInput->getOptionsButton();
     if (currentOptionsButton && !lastOptionsButton) {
+        #if NAVX_AVAILABLE
         m_navx->Reset();
         printf("⚡ NavX gyroscope reset to zero\n");
+        #else
+        printf("⚡ Gyro reset requested (NavX not available in this build)\n");
+        #endif
     }
     lastOptionsButton = currentOptionsButton;
 }
@@ -161,6 +174,7 @@ void Robot::updateDashboard() {
     m_drivetrain->updateTelemetry();
     
     // Update NavX telemetry
+    #if NAVX_AVAILABLE
     if (m_navx->IsConnected()) {
         frc::SmartDashboard::PutNumber("Gyro Yaw", m_navx->GetYaw());
         frc::SmartDashboard::PutNumber("Gyro Pitch", m_navx->GetPitch());
@@ -169,6 +183,9 @@ void Robot::updateDashboard() {
     } else {
         frc::SmartDashboard::PutBoolean("NavX Connected", false);
     }
+    #else
+    frc::SmartDashboard::PutString("Gyro Status", "NavX headers not present in CI build");
+    #endif
     
     // Update input info
     Vector2D translation = m_gamepadInput->getDriveTranslation();

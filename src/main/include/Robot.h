@@ -1,7 +1,13 @@
 #pragma once
 
 #include <frc/TimedRobot.h>
+
+#if __has_include(<Studica/AHRS.h>)
 #include <Studica/AHRS.h>
+#define NAVX_AVAILABLE 1
+#else
+#define NAVX_AVAILABLE 0
+#endif
 #include <memory>
 
 #include "Drivetrain.h"
@@ -31,7 +37,9 @@ private:
     // Hardware
     std::unique_ptr<Drivetrain> m_drivetrain;
     std::unique_ptr<GamepadInput> m_gamepadInput;
+    #if NAVX_AVAILABLE
     std::unique_ptr<studica::AHRS> m_navx;
+    #endif
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
