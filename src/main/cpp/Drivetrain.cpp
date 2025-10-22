@@ -3,6 +3,10 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <algorithm>
+#include <frc/kinematics/SwerveModuleState.h>
+#include <units/velocity.h>
+#include <units/angle.h>
+#include <wpi/array.h>
 
 Drivetrain::Drivetrain() {
     // Create swerve modules with their respective IDs and encoder offsets
@@ -13,12 +17,20 @@ Drivetrain::Drivetrain() {
     m_modules[3] = std::make_unique<SwerveModule>(BACK_RIGHT_DRIVE_ID, BACK_RIGHT_STEER_ID, BACK_RIGHT_ENCODER_ID, BACK_RIGHT_ENCODER_OFFSET);
     
     initializeModulePositions();
+
+    // Build WPILib kinematics using module translations (FL, FR, BL, BR)
+    m_kinematics = new frc::SwerveDriveKinematics<4>(
+        m_moduleTranslations[0],
+        m_moduleTranslations[1],
+        m_moduleTranslations[2],
+        m_moduleTranslations[3]
+    );
 }
 
 void Drivetrain::drive(const ChassisSpeed& speeds) {
     auto moduleStates = calculateModuleStates(speeds);
     normalizeWheelSpeeds(moduleStates);
-    
+
     for (size_t i = 0; i < 4; i++) {
         m_modules[i]->setDesiredState(moduleStates[i]);
     }
@@ -86,44 +98,47 @@ void Drivetrain::updateTelemetry() {
 
 std::array<SwerveModuleState, 4> Drivetrain::calculateModuleStates(const ChassisSpeed& speeds) const {
     std::array<SwerveModuleState, 4> moduleStates;
-    
+
+    // Convert our ChassisSpeed to WPILib's for kinematics
+    frc::ChassisSpeeds wpilibSpeeds{
+        units::meters_per_second_t{speeds.vx},
+        units::meters_per_second_t{speeds.vy},
+        units::radians_per_second_t{speeds.omega}
+    };
+    auto wpilibStates = m_kinematics->ToSwerveModuleStates(wpilibSpeeds);
+
     for (size_t i = 0; i < 4; i++) {
-        // Calculate the velocity vector for this module
-        Vector2D moduleVelocity;
-        moduleVelocity.x = speeds.vx - speeds.omega * m_modulePositions[i].position.y;
-        moduleVelocity.y = speeds.vy + speeds.omega * m_modulePositions[i].position.x;
-        
-        // Convert to speed and angle
-        moduleStates[i].speed = moduleVelocity.magnitude();
-        moduleStates[i].angle = std::atan2(moduleVelocity.y, moduleVelocity.x);
+        moduleStates[i].speed = wpilibStates[i].speed.value();
+        moduleStates[i].angle = wpilibStates[i].angle.Radians().value();
     }
-    
+
     return moduleStates;
 }
 
 void Drivetrain::normalizeWheelSpeeds(std::array<SwerveModuleState, 4>& moduleStates) const {
-    // Find the maximum speed
-    double maxSpeed = 0.0;
-    for (const auto& state : moduleStates) {
-        maxSpeed = std::max(maxSpeed, std::abs(state.speed));
+    // Use WPILib to desaturate speeds based on MAX_DRIVE_SPEED
+    std::array<frc::SwerveModuleState, 4> stdStates;
+    for (size_t i = 0; i < 4; i++) {
+        stdStates[i] = frc::SwerveModuleState{
+            units::meters_per_second_t{moduleStates[i].speed},
+            frc::Rotation2d{units::radian_t{moduleStates[i].angle}}
+        };
     }
-    
-    // If any speed exceeds maximum, scale all speeds down proportionally
-    if (maxSpeed > MAX_DRIVE_SPEED) {
-        double scale = MAX_DRIVE_SPEED / maxSpeed;
-        for (auto& state : moduleStates) {
-            state.speed *= scale;
-        }
+    wpi::array<frc::SwerveModuleState, 4> wpiStates{stdStates};
+    frc::SwerveDriveKinematics<4>::DesaturateWheelSpeeds(&wpiStates, units::meters_per_second_t{MAX_DRIVE_SPEED});
+    for (size_t i = 0; i < 4; i++) {
+        moduleStates[i].speed = wpiStates[i].speed.value();
+        moduleStates[i].angle = wpiStates[i].angle.Radians().value();
     }
 }
 
 void Drivetrain::initializeModulePositions() {
-    // Module positions relative to robot center (x forward, y left)
-    double halfLength = WHEELBASE_LENGTH / 2.0;
-    double halfWidth = WHEELBASE_WIDTH / 2.0;
-    
-    m_modulePositions[0].position = {halfLength, halfWidth};   // Front Left
-    m_modulePositions[1].position = {halfLength, -halfWidth};  // Front Right  
-    m_modulePositions[2].position = {-halfLength, halfWidth};  // Back Left
-    m_modulePositions[3].position = {-halfLength, -halfWidth}; // Back Right
+    // Module translations relative to robot center (WPILib: x forward, y left), meters
+    const double halfLength = WHEELBASE_LENGTH / 2.0;
+    const double halfWidth  = WHEELBASE_WIDTH  / 2.0;
+
+    m_moduleTranslations[0] = frc::Translation2d{units::meter_t{ halfLength}, units::meter_t{ halfWidth}};  // FL
+    m_moduleTranslations[1] = frc::Translation2d{units::meter_t{ halfLength}, units::meter_t{-halfWidth}};  // FR
+    m_moduleTranslations[2] = frc::Translation2d{units::meter_t{-halfLength}, units::meter_t{ halfWidth}};  // BL
+    m_moduleTranslations[3] = frc::Translation2d{units::meter_t{-halfLength}, units::meter_t{-halfWidth}};  // BR
 }

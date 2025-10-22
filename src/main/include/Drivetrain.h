@@ -6,6 +6,11 @@
 #include "SwerveModule.h"
 #include "MathUtils.h"
 
+#include <frc/geometry/Translation2d.h>
+#include <frc/kinematics/ChassisSpeeds.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/kinematics/SwerveModuleState.h>
+
 /**
  * Clean swerve drivetrain implementation
  * Manages 4 swerve modules and provides high-level drive control
@@ -63,12 +68,9 @@ private:
     // Swerve modules: Front-Left, Front-Right, Back-Left, Back-Right
     std::array<std::unique_ptr<SwerveModule>, 4> m_modules;
     
-    // Swerve kinematics
-    struct ModulePosition {
-        Vector2D position;  // Position relative to robot center
-    };
-    
-    std::array<ModulePosition, 4> m_modulePositions;
+    // WPILib swerve kinematics
+    frc::SwerveDriveKinematics<4>* m_kinematics = nullptr;
+    std::array<frc::Translation2d, 4> m_moduleTranslations; // FL, FR, BL, BR
     
     /**
      * Convert chassis speeds to individual module states

@@ -10,10 +10,10 @@ compiling SwerveModule.cpp successful.
   107 |     const double steerCF = (2.0 * M_PI) / STEER_GEAR_RATIO; // rotations → radians
       |                  ^~~~~~~
 
-compiling Drivetrain.cpp successful.
-
 compiling Robot.cpp successful.
 
 compiling Main.cpp successful.
+
+compiling Drivetrain.cpp successful.
 
 Finished compileFrcUserProgramReleaseExecutableFrcUserProgramCpp, see full log file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramReleaseExecutableFrcUserProgramCpp/output.txt.

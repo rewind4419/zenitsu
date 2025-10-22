@@ -1,8 +1,6 @@
 See file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt for all output for compileFrcUserProgramDebugExecutableFrcUserProgramCpp.
 compiling GamepadInput.cpp successful.
 
-compiling Drivetrain.cpp successful.
-
 compiling SwerveModule.cpp successful.
 /Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp: In member function 'void SwerveModule::configureMotors()':
 /Users/alwatson/Downloads/zenitsu/src/main/cpp/SwerveModule.cpp:102:18: warning: unused variable 'driveCF' [-Wunused-variable]
@@ -15,5 +13,7 @@ compiling SwerveModule.cpp successful.
 compiling Robot.cpp successful.
 
 compiling Main.cpp successful.
+
+compiling Drivetrain.cpp successful.
 
 Finished compileFrcUserProgramDebugExecutableFrcUserProgramCpp, see full log file:///Users/alwatson/Downloads/zenitsu/build/tmp/compileFrcUserProgramDebugExecutableFrcUserProgramCpp/output.txt.
