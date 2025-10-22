@@ -35,6 +35,5 @@
 After successful deploy:
 - [ ] Connect PlayStation controller
 - [ ] Enable robot in teleop
-- [ ] Test deadman switch (L2)
 - [ ] Verify wheels respond to joystick
 - [ ] Check SmartDashboard for sensor data
