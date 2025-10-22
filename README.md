@@ -1,4 +1,4 @@
-# ⚡ Zenitsu - FRC Swerve Robot
+# Zenitsu - FRC Swerve Robot
 
 Clean, modern swerve drivetrain implementation for FRC 2026 season. Built with REV SparkMax motors, CTRE CANcoders, and NavX gyroscope.
 

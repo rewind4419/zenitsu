@@ -16,12 +16,12 @@ void Robot::RobotInit() {
     #if NAVX_AVAILABLE
     try {
         m_navx = std::make_unique<studica::AHRS>(studica::AHRS::NavXComType::kMXP_SPI);
-        printf("⚡ NavX gyroscope initialized via Studica library\n");
+        printf("NavX gyroscope initialized via Studica library\n");
     } catch (std::exception& ex) {
-        printf("⚡ NavX initialization failed: %s\n", ex.what());
+        printf("NavX initialization failed: %s\n", ex.what());
     }
     #else
-    printf("⚡ NavX headers not available in this build environment (CI sim). Skipping NavX init.\n");
+    printf("NavX headers not available in this build environment (CI sim). Skipping NavX init.\n");
     #endif
     
     // Initialize dashboard
@@ -33,10 +33,8 @@ void Robot::RobotInit() {
     // Show field view for odometry (CONFIGURABLE: use during autos/tuning)
     frc::SmartDashboard::PutData("Field", &m_field);
     
-    printf("🗾⚡ Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
-    printf("⚡ NavX gyroscope connected for field-relative driving\n");
-    printf("⚡ Press L1+R1+Options to enter calibration mode\n");
-    printf("⚡ Press PS button for emergency stop\n");
+    printf("Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
+    printf("NavX gyroscope connected for field-relative driving\n");
 }
 
 void Robot::RobotPeriodic() {
@@ -68,7 +66,8 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
     frc::SmartDashboard::PutString("Robot State", "Teleop");
     
-    printf("⚡ Zenitsu entering teleop mode\n");
+    // printf("Zenitsu entering teleop mode\n");
+    // Unnessesary, we will always know when it enters teleop
 }
 
 void Robot::TeleopPeriodic() {
@@ -81,10 +80,10 @@ void Robot::TeleopPeriodic() {
     if (currentCalibrationToggle && !lastCalibrationToggle) {
         m_calibrationMode = !m_calibrationMode;
         frc::SmartDashboard::PutBoolean("Calibration Mode", m_calibrationMode);
-        printf("⚡ Calibration mode %s\n", m_calibrationMode ? "ENABLED" : "DISABLED");
+        printf("Calibration mode %s\n", m_calibrationMode ? "ENABLED" : "DISABLED");
         
         if (m_calibrationMode) {
-            printf("⚡ CALIBRATION MODE: Align all wheels forward and record encoder values\n");
+            printf("CALIBRATION MODE: Align all wheels forward and record encoder values\n");
         }
     }
     lastCalibrationToggle = currentCalibrationToggle;
@@ -119,7 +118,7 @@ void Robot::handleTeleopDrive() {
     if (currentPSButton && !lastPSButton) {
         m_emergencyStop = !m_emergencyStop;
         frc::SmartDashboard::PutBoolean("Emergency Stop", m_emergencyStop);
-        printf("⚡ Emergency stop %s\n", m_emergencyStop ? "ACTIVATED" : "DEACTIVATED");
+        printf("Emergency stop %s\n", m_emergencyStop ? "ACTIVATED" : "DEACTIVATED");
     }
     lastPSButton = currentPSButton;
     
@@ -180,7 +179,7 @@ void Robot::handleTeleopDrive() {
     if (currentShareButton && !lastShareButton) {
         m_fieldRelative = !m_fieldRelative;
         frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
-        printf("⚡ Field-relative mode %s\n", m_fieldRelative ? "ENABLED" : "DISABLED");
+        printf("Field-relative mode %s\n", m_fieldRelative ? "ENABLED" : "DISABLED");
     }
     lastShareButton = currentShareButton;
     
@@ -190,9 +189,9 @@ void Robot::handleTeleopDrive() {
     if (currentOptionsButton && !lastOptionsButton) {
         #if NAVX_AVAILABLE
         m_navx->Reset();
-        printf("⚡ NavX gyroscope reset to zero\n");
+        printf("NavX gyroscope reset to zero\n");
         #else
-        printf("⚡ Gyro reset requested (NavX not available in this build)\n");
+        printf("Gyro reset requested (NavX not available in this build)\n");
         #endif
     }
     lastOptionsButton = currentOptionsButton;
@@ -239,15 +238,16 @@ void Robot::handleCalibration() {
     // Note: These would be the values to subtract from raw encoder readings
     // to get zero when wheels are pointing forward
     
-    frc::SmartDashboard::PutString("Calibration", "ALIGN WHEELS FORWARD");
-    frc::SmartDashboard::PutString("Instructions", "1. Manually align all wheels to point forward");
-    frc::SmartDashboard::PutString("Instructions2", "2. Record the encoder values below");
-    frc::SmartDashboard::PutString("Instructions3", "3. Update Config.h with these offset values");
-    frc::SmartDashboard::PutString("Instructions4", "4. Exit calibration mode when done");
+
+    //none of these need to be constantly updated, just printed once
+    printf("Instructions", "1. Manually align all wheels to point forward\n");
+    printf("2. Record the encoder values below\n");
+    printf("Instructions3", "3. Update Config.h with these offset values\n");
+    printf("Instructions4", "4. Exit calibration mode when done\n");
     
     // Display current raw encoder positions (radians) for copy/paste
     auto raw = m_drivetrain->getRawModuleAngles();
-    printf("⚡ CALIBRATION - Use these as offsets in Config.h (radians):\n");
+    printf("CALIBRATION - Use these as offsets in Config.h (radians):\n");
     printf("   FRONT_LEFT_ENCODER_OFFSET  = %.6f\n", raw[0]);
     printf("   FRONT_RIGHT_ENCODER_OFFSET = %.6f\n", raw[1]);
     printf("   BACK_LEFT_ENCODER_OFFSET   = %.6f\n", raw[2]);
