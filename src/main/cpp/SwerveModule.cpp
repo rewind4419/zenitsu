@@ -22,6 +22,7 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
 
     // Optimize the state to avoid spinning more than 90 degrees
     const SwerveModuleState optimizedState = optimizeState(desiredState, currentAngle);
+    m_desiredAngle = optimizedState.angle;
 
     // Drive output normalized -1..1
     const double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;
@@ -90,22 +91,26 @@ SwerveModuleState SwerveModule::optimizeState(const SwerveModuleState& desiredSt
 
 void SwerveModule::configureMotors() {
     // Idle mode and current limits
-    // Note: If your installed REV API differs, adjust these calls accordingly.
-    // Fallback: if these symbols differ in your vendor library, keep default settings.
-    // (Leaving these here as best-effort; safe to compile on stock 2025 libs.)
-    // m_driveMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
-    // m_steerMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
-    // m_driveMotor->SetSmartCurrentLimit(40);
-    // m_steerMotor->SetSmartCurrentLimit(20);
+    // Apply brake mode and current limits where APIs are available
+    #ifdef REV_BRUSHLESS
+    m_driveMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
+    m_steerMotor->SetIdleMode(rev::spark::SparkMax::IdleMode::kBrake);
+    m_driveMotor->SetSmartCurrentLimit(40);
+    m_steerMotor->SetSmartCurrentLimit(20);
+    #endif
 
     // Conversion factors for student-friendly units
     const double driveCF = (WHEEL_RADIUS * 2.0 * M_PI) / DRIVE_GEAR_RATIO; // rotations → meters
-    // If conversion factor APIs are present, prefer them; otherwise keep manual math elsewhere
-    // m_driveMotor->GetEncoder().SetPositionConversionFactor(driveCF);
-    // m_driveMotor->GetEncoder().SetVelocityConversionFactor(driveCF / 60.0);
+    // Enable conversion factors when available
+    #ifdef REV_BRUSHLESS
+    m_driveMotor->GetEncoder().SetPositionConversionFactor(driveCF);
+    m_driveMotor->GetEncoder().SetVelocityConversionFactor(driveCF / 60.0);
+    #endif
 
     const double steerCF = (2.0 * M_PI) / STEER_GEAR_RATIO; // rotations → radians
-    // m_steerMotor->GetEncoder().SetPositionConversionFactor(steerCF);
+    #ifdef REV_BRUSHLESS
+    m_steerMotor->GetEncoder().SetPositionConversionFactor(steerCF);
+    #endif
 
     // Seed steer encoder to current absolute angle (with offset)
     m_steerMotor->GetEncoder().SetPosition(getAbsoluteAngle());

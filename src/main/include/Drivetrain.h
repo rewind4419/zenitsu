@@ -37,6 +37,11 @@ public:
     void driveFieldRelative(const ChassisSpeed& speeds, double gyroAngle);
     
     /**
+     * Convenience: field-relative drive using unitless doubles (m/s, rad/s, yaw radians)
+     */
+    void driveFieldRelativeUnits(double vx, double vy, double omega, double yawRadians);
+    
+    /**
      * Stop all modules
      */
     void stop();
@@ -85,11 +90,11 @@ private:
     std::array<std::unique_ptr<SwerveModule>, 4> m_modules;
     
     // WPILib swerve kinematics
-    frc::SwerveDriveKinematics<4>* m_kinematics = nullptr;
+    std::unique_ptr<frc::SwerveDriveKinematics<4>> m_kinematics;
     std::array<frc::Translation2d, 4> m_moduleTranslations; // FL, FR, BL, BR
 
     // WPILib odometry
-    frc::SwerveDriveOdometry<4>* m_odometry = nullptr;
+    std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry;
     frc::Pose2d m_pose;
     
     /**

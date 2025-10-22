@@ -50,6 +50,9 @@ public:
      */
     void stop();
 
+    // Optional: expose desired angle for telemetry
+    double getDesiredAngle() const { return m_desiredAngle; }
+
     /**
      * Raw absolute angle from CANcoder without offset, radians (0..2π)
      */
@@ -66,6 +69,7 @@ private:
     
     // State
     double m_lastAngle = 0.0;
+    double m_desiredAngle = 0.0;
     
     // Helper functions
     double getAbsoluteAngle() const;

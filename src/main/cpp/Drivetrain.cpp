@@ -19,7 +19,7 @@ Drivetrain::Drivetrain() {
     initializeModulePositions();
 
     // Build WPILib kinematics using module translations (FL, FR, BL, BR)
-    m_kinematics = new frc::SwerveDriveKinematics<4>(
+    m_kinematics = std::make_unique<frc::SwerveDriveKinematics<4>>(
         m_moduleTranslations[0],
         m_moduleTranslations[1],
         m_moduleTranslations[2],
@@ -28,12 +28,26 @@ Drivetrain::Drivetrain() {
 
     // Initialize odometry at origin (guarded; can be used when gyro present)
     m_pose = frc::Pose2d{};
-    m_odometry = new frc::SwerveDriveOdometry<4>(
+    m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(
         *m_kinematics,
         frc::Rotation2d{units::radian_t{0.0}},
         getModulePositions(),
         m_pose
     );
+}
+
+void Drivetrain::driveFieldRelativeUnits(double vx, double vy, double omega, double yawRadians) {
+    auto speeds = frc::ChassisSpeeds::FromFieldRelativeSpeeds(
+        units::meters_per_second_t{vx},
+        units::meters_per_second_t{vy},
+        units::radians_per_second_t{omega},
+        frc::Rotation2d{units::radian_t{yawRadians}}
+    );
+    ChassisSpeed s;
+    s.vx = speeds.vx.value();
+    s.vy = speeds.vy.value();
+    s.omega = speeds.omega.value();
+    drive(s);
 }
 
 void Drivetrain::drive(const ChassisSpeed& speeds) {
