@@ -30,8 +30,8 @@ constexpr int BACK_RIGHT_ENCODER_ID = 11;
 // PHYSICAL DIMENSIONS (meters)
 // =============================================================================
 
-constexpr double WHEELBASE_LENGTH = 0.5842;  // Distance between front and rear wheels
-constexpr double WHEELBASE_WIDTH = 0.5842;   // Distance between left and right wheels
+constexpr double WHEELBASE_LENGTH = 0.45;  // Distance between front and rear wheels
+constexpr double WHEELBASE_WIDTH = 0.45;   // Distance between left and right wheels
 constexpr double WHEEL_RADIUS = 0.0508;      // 4 inch wheels -> 2 inch radius
 
 // =============================================================================
@@ -39,14 +39,14 @@ constexpr double WHEEL_RADIUS = 0.0508;      // 4 inch wheels -> 2 inch radius
 // =============================================================================
 
 constexpr double DRIVE_GEAR_RATIO = 6.75;    // L2 gearing
-constexpr double STEER_GEAR_RATIO = 150.0/7.0;  // Steering gear ratio
+constexpr double STEER_GEAR_RATIO = 12.8;    // Steering gear ratio
 
 // =============================================================================
 // CONTROL SETTINGS
 // =============================================================================
 
-constexpr double MAX_DRIVE_SPEED = 4.0;      // m/s
-constexpr double MAX_ANGULAR_SPEED = 2 * 3.14159; // rad/s
+constexpr double MAX_DRIVE_SPEED = 1.0;      // m/s - reduced from 4.0 to 1.0 to match the physical robot
+constexpr double MAX_ANGULAR_SPEED = 1 * 3.14159; // rad/s - reduced from 2 to 1 multiplier for testing
 
 // Driver control speeds
 constexpr double NORMAL_DRIVE_SPEED = 1.0;   // Normal driving multiplier
