@@ -61,16 +61,16 @@ void Robot::AutonomousInit() {
     
     // Reset auto timer
     m_autoStartTime = frc::Timer::GetFPGATimestamp().value();
-    printf("Starting autonomous: drive backwards at 50%% for 5 seconds\n");
+    printf("Starting autonomous: drive forwards at 50%% for 5 seconds\n");
 }
 
 void Robot::AutonomousPeriodic() {
     double elapsed = frc::Timer::GetFPGATimestamp().value() - m_autoStartTime;
     
     if (elapsed < 5.0) {
-        // Drive backwards at 50% speed for 5 seconds
+        // Drive forwards at 50% speed for 5 seconds
         ChassisSpeed speeds;
-        speeds.vx = -0.5 * MAX_DRIVE_SPEED;  // Backwards (negative)
+        speeds.vx = 0.5 * MAX_DRIVE_SPEED;   // Forwards (positive)
         speeds.vy = 0.0;                      // No strafe
         speeds.omega = 0.0;                   // No rotation
         m_drivetrain->drive(speeds);
@@ -78,7 +78,7 @@ void Robot::AutonomousPeriodic() {
         // Print status every 0.5 seconds
         static double lastPrint = 0.0;
         if (elapsed - lastPrint > 0.5) {
-            printf("Auto: %.1fs - driving backwards\n", elapsed);
+            printf("Auto: %.1fs - driving forwards\n", elapsed);
             lastPrint = elapsed;
         }
     } else {
