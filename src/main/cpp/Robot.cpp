@@ -8,6 +8,10 @@ Robot::Robot() {
 }
 
 void Robot::RobotInit() {
+    // Initialize DataLogManager for AdvantageScope analysis
+    frc::DataLogManager::Start();
+    printf("DataLogManager started for AdvantageScope logging\n");
+    
     // Initialize hardware
     m_drivetrain = std::make_unique<Drivetrain>();
     m_gamepadInput = std::make_unique<GamepadInput>(DRIVER_CONTROLLER_PORT);
@@ -41,6 +45,9 @@ void Robot::RobotPeriodic() {
     
     // Update telemetry
     updateDashboard();
+    
+    // Log drivetrain performance for AdvantageScope
+    logDrivetrainPerformance();
 
     // Update odometry and field visualization when NavX is present
     #if NAVX_AVAILABLE
@@ -140,42 +147,6 @@ void Robot::handleTeleopDrive() {
         return;
     }
     
-    // Share + Options: 4s steer, then 4s drive
-    if (shareBtn && optionsBtn) {
-        static double diagStartTime = 0.0;
-        double now = frc::Timer::GetFPGATimestamp().value();
-        
-        if (diagStartTime == 0.0) {
-            diagStartTime = now;
-            printf("Starting 4s steer + 4s drive diagnostic\n");
-        }
-        
-        double elapsed = now - diagStartTime;
-        
-        if (elapsed < 4.0) {
-            // First 4 seconds: steer only
-            m_drivetrain->steerOnlyDuty(0.2);
-            frc::SmartDashboard::PutString("Diag Mode", "Steer 4s");
-            printf("Steer test: %.1fs elapsed\n", elapsed);
-        } else if (elapsed < 8.0) {
-            // Next 4 seconds: drive only
-            m_drivetrain->driveOnlyDuty(0.3);
-            frc::SmartDashboard::PutString("Diag Mode", "Drive 4s");
-            printf("Drive test: %.1fs elapsed\n", elapsed - 4.0);
-        } else {
-            // Done
-            m_drivetrain->stop();
-            diagStartTime = 0.0;
-            frc::SmartDashboard::PutString("Diag Mode", "Complete");
-            printf("Diagnostic complete\n");
-        }
-        return;
-    } else {
-        // Reset timer when not in Share+Options mode
-        static double& diagStartTime = *(new double(0.0));
-        diagStartTime = 0.0;
-    }
-    
     frc::SmartDashboard::PutString("Diag Mode", "Off");
     
     // Get driver inputs
@@ -267,4 +238,105 @@ void Robot::updateDashboard() {
     // Update control mode info
     frc::SmartDashboard::PutBoolean("Turbo Mode (R1)", m_gamepadInput->isTurboMode());
     frc::SmartDashboard::PutNumber("Speed Multiplier", m_gamepadInput->getSpeedMultiplier());
+}
+
+void Robot::logDrivetrainPerformance() {
+    // Get DataLog reference
+    wpi::log::DataLog& log = frc::DataLogManager::GetLog();
+    
+    // Create static log entries (created once, reused every loop)
+    // Chassis speeds
+    static wpi::log::DoubleLogEntry logChassisVx(log, "Drivetrain/Chassis/vx");
+    static wpi::log::DoubleLogEntry logChassisVy(log, "Drivetrain/Chassis/vy");
+    static wpi::log::DoubleLogEntry logChassisOmega(log, "Drivetrain/Chassis/omega");
+    
+    // Front Left module
+    static wpi::log::DoubleLogEntry logFLDesiredSpeed(log, "Drivetrain/FL/Desired/Speed");
+    static wpi::log::DoubleLogEntry logFLActualSpeed(log, "Drivetrain/FL/Actual/Speed");
+    static wpi::log::DoubleLogEntry logFLDesiredAngle(log, "Drivetrain/FL/Desired/Angle");
+    static wpi::log::DoubleLogEntry logFLActualAngle(log, "Drivetrain/FL/Actual/Angle");
+    static wpi::log::DoubleLogEntry logFLDriveOutput(log, "Drivetrain/FL/Drive/AppliedOutput");
+    static wpi::log::DoubleLogEntry logFLSteerOutput(log, "Drivetrain/FL/Steer/AppliedOutput");
+    static wpi::log::DoubleLogEntry logFLDriveCurrent(log, "Drivetrain/FL/Drive/Current");
+    static wpi::log::DoubleLogEntry logFLSteerCurrent(log, "Drivetrain/FL/Steer/Current");
+    
+    // Front Right module
+    static wpi::log::DoubleLogEntry logFRDesiredSpeed(log, "Drivetrain/FR/Desired/Speed");
+    static wpi::log::DoubleLogEntry logFRActualSpeed(log, "Drivetrain/FR/Actual/Speed");
+    static wpi::log::DoubleLogEntry logFRDesiredAngle(log, "Drivetrain/FR/Desired/Angle");
+    static wpi::log::DoubleLogEntry logFRActualAngle(log, "Drivetrain/FR/Actual/Angle");
+    static wpi::log::DoubleLogEntry logFRDriveOutput(log, "Drivetrain/FR/Drive/AppliedOutput");
+    static wpi::log::DoubleLogEntry logFRSteerOutput(log, "Drivetrain/FR/Steer/AppliedOutput");
+    static wpi::log::DoubleLogEntry logFRDriveCurrent(log, "Drivetrain/FR/Drive/Current");
+    static wpi::log::DoubleLogEntry logFRSteerCurrent(log, "Drivetrain/FR/Steer/Current");
+    
+    // Back Left module
+    static wpi::log::DoubleLogEntry logBLDesiredSpeed(log, "Drivetrain/BL/Desired/Speed");
+    static wpi::log::DoubleLogEntry logBLActualSpeed(log, "Drivetrain/BL/Actual/Speed");
+    static wpi::log::DoubleLogEntry logBLDesiredAngle(log, "Drivetrain/BL/Desired/Angle");
+    static wpi::log::DoubleLogEntry logBLActualAngle(log, "Drivetrain/BL/Actual/Angle");
+    static wpi::log::DoubleLogEntry logBLDriveOutput(log, "Drivetrain/BL/Drive/AppliedOutput");
+    static wpi::log::DoubleLogEntry logBLSteerOutput(log, "Drivetrain/BL/Steer/AppliedOutput");
+    static wpi::log::DoubleLogEntry logBLDriveCurrent(log, "Drivetrain/BL/Drive/Current");
+    static wpi::log::DoubleLogEntry logBLSteerCurrent(log, "Drivetrain/BL/Steer/Current");
+    
+    // Back Right module
+    static wpi::log::DoubleLogEntry logBRDesiredSpeed(log, "Drivetrain/BR/Desired/Speed");
+    static wpi::log::DoubleLogEntry logBRActualSpeed(log, "Drivetrain/BR/Actual/Speed");
+    static wpi::log::DoubleLogEntry logBRDesiredAngle(log, "Drivetrain/BR/Desired/Angle");
+    static wpi::log::DoubleLogEntry logBRActualAngle(log, "Drivetrain/BR/Actual/Angle");
+    static wpi::log::DoubleLogEntry logBRDriveOutput(log, "Drivetrain/BR/Drive/AppliedOutput");
+    static wpi::log::DoubleLogEntry logBRSteerOutput(log, "Drivetrain/BR/Steer/AppliedOutput");
+    static wpi::log::DoubleLogEntry logBRDriveCurrent(log, "Drivetrain/BR/Drive/Current");
+    static wpi::log::DoubleLogEntry logBRSteerCurrent(log, "Drivetrain/BR/Steer/Current");
+    
+    // Get data from drivetrain
+    auto commandedSpeeds = m_drivetrain->getLastCommandedSpeeds();
+    auto actualStates = m_drivetrain->getModuleStates();
+    const auto& modules = m_drivetrain->getModules();
+    
+    // Log chassis speeds
+    logChassisVx.Append(commandedSpeeds.vx);
+    logChassisVy.Append(commandedSpeeds.vy);
+    logChassisOmega.Append(commandedSpeeds.omega);
+    
+    // Log Front Left (index 0)
+    logFLDesiredSpeed.Append(modules[0]->getDesiredSpeed());
+    logFLActualSpeed.Append(actualStates[0].speed);
+    logFLDesiredAngle.Append(radiansToDegrees(modules[0]->getDesiredAngle()));
+    logFLActualAngle.Append(radiansToDegrees(actualStates[0].angle));
+    logFLDriveOutput.Append(modules[0]->getDriveAppliedOutput());
+    logFLSteerOutput.Append(modules[0]->getSteerAppliedOutput());
+    logFLDriveCurrent.Append(modules[0]->getDriveOutputCurrent());
+    logFLSteerCurrent.Append(modules[0]->getSteerOutputCurrent());
+    
+    // Log Front Right (index 1)
+    logFRDesiredSpeed.Append(modules[1]->getDesiredSpeed());
+    logFRActualSpeed.Append(actualStates[1].speed);
+    logFRDesiredAngle.Append(radiansToDegrees(modules[1]->getDesiredAngle()));
+    logFRActualAngle.Append(radiansToDegrees(actualStates[1].angle));
+    logFRDriveOutput.Append(modules[1]->getDriveAppliedOutput());
+    logFRSteerOutput.Append(modules[1]->getSteerAppliedOutput());
+    logFRDriveCurrent.Append(modules[1]->getDriveOutputCurrent());
+    logFRSteerCurrent.Append(modules[1]->getSteerOutputCurrent());
+    
+    // Log Back Left (index 2)
+    logBLDesiredSpeed.Append(modules[2]->getDesiredSpeed());
+    logBLActualSpeed.Append(actualStates[2].speed);
+    logBLDesiredAngle.Append(radiansToDegrees(modules[2]->getDesiredAngle()));
+    logBLActualAngle.Append(radiansToDegrees(actualStates[2].angle));
+    logBLDriveOutput.Append(modules[2]->getDriveAppliedOutput());
+    logBLSteerOutput.Append(modules[2]->getSteerAppliedOutput());
+    logBLDriveCurrent.Append(modules[2]->getDriveOutputCurrent());
+    logBLSteerCurrent.Append(modules[2]->getSteerOutputCurrent());
+    
+    // Log Back Right (index 3)
+    logBRDesiredSpeed.Append(modules[3]->getDesiredSpeed());
+    logBRActualSpeed.Append(actualStates[3].speed);
+    logBRDesiredAngle.Append(radiansToDegrees(modules[3]->getDesiredAngle()));
+    logBRActualAngle.Append(radiansToDegrees(actualStates[3].angle));
+    logBRDriveOutput.Append(modules[3]->getDriveAppliedOutput());
+    logBRSteerOutput.Append(modules[3]->getSteerAppliedOutput());
+    logBRDriveCurrent.Append(modules[3]->getDriveOutputCurrent());
+    logBRSteerCurrent.Append(modules[3]->getSteerOutputCurrent());
 }

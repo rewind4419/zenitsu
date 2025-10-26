@@ -23,6 +23,7 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
     // Optimize the state to avoid spinning more than 90 degrees
     const SwerveModuleState optimizedState = optimizeState(desiredState, currentAngle);
     m_desiredAngle = optimizedState.angle;
+    m_desiredSpeed = optimizedState.speed;
 
     // Drive output normalized -1..1
     const double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;

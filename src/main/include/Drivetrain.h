@@ -94,6 +94,16 @@ public:
      * Diagnostic: steer all motors at fixed duty (steer only, drive = 0)
      */
     void steerOnlyDuty(double duty);
+    
+    /**
+     * Get last commanded chassis speeds for telemetry
+     */
+    ChassisSpeed getLastCommandedSpeeds() const { return m_lastCommandedSpeeds; }
+    
+    /**
+     * Get direct access to modules for detailed telemetry
+     */
+    const std::array<std::unique_ptr<SwerveModule>, 4>& getModules() const { return m_modules; }
 
 private:
     // Swerve modules: Front-Left, Front-Right, Back-Left, Back-Right
@@ -106,6 +116,9 @@ private:
     // WPILib odometry
     std::unique_ptr<frc::SwerveDriveOdometry<4>> m_odometry;
     frc::Pose2d m_pose;
+    
+    // Last commanded speeds for telemetry
+    ChassisSpeed m_lastCommandedSpeeds;
     
     /**
      * Convert chassis speeds to individual module states

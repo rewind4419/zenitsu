@@ -52,11 +52,20 @@ public:
 
     // Optional: expose desired angle for telemetry
     double getDesiredAngle() const { return m_desiredAngle; }
+    
+    // Telemetry: expose desired speed
+    double getDesiredSpeed() const { return m_desiredSpeed; }
 
     /**
      * Raw absolute angle from CANcoder without offset, radians (0..2π)
      */
     double getRawAbsoluteAngle() const;
+    
+    // Telemetry helpers
+    double getDriveAppliedOutput() const { return m_driveMotor ? m_driveMotor->GetAppliedOutput() : 0.0; }
+    double getSteerAppliedOutput() const { return m_steerMotor ? m_steerMotor->GetAppliedOutput() : 0.0; }
+    double getDriveOutputCurrent() const { return m_driveMotor ? m_driveMotor->GetOutputCurrent() : 0.0; }
+    double getSteerOutputCurrent() const { return m_steerMotor ? m_steerMotor->GetOutputCurrent() : 0.0; }
 
     /**
      * Diagnostic: set drive motor duty directly
@@ -80,6 +89,7 @@ private:
     // State
     double m_lastAngle = 0.0;
     double m_desiredAngle = 0.0;
+    double m_desiredSpeed = 0.0;
     
     // Helper functions
     double getAbsoluteAngle() const;

@@ -51,6 +51,9 @@ void Drivetrain::driveFieldRelativeUnits(double vx, double vy, double omega, dou
 }
 
 void Drivetrain::drive(const ChassisSpeed& speeds) {
+    // Store commanded speeds for telemetry
+    m_lastCommandedSpeeds = speeds;
+    
     auto moduleStates = calculateModuleStates(speeds);
     normalizeWheelSpeeds(moduleStates);
 

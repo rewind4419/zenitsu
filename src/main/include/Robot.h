@@ -3,6 +3,8 @@
 #include <frc/TimedRobot.h>
 #include <frc/filter/SlewRateLimiter.h>  // Input smoothing (tune rates per team preference)
 #include <frc/smartdashboard/Field2d.h> // Visualize odometry on dashboard
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 #if __has_include(<Studica/AHRS.h>)
 #include <Studica/AHRS.h>
@@ -70,4 +72,9 @@ private:
      * Update dashboard values  
      */
     void updateDashboard();
+    
+    /**
+     * Log drivetrain performance data to DataLog for AdvantageScope analysis
+     */
+    void logDrivetrainPerformance();
 };
