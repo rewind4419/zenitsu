@@ -51,6 +51,9 @@ void Drivetrain::driveFieldRelativeUnits(double vx, double vy, double omega, dou
 }
 
 void Drivetrain::drive(const ChassisSpeed& speeds) {
+    // Store commanded speeds for telemetry
+    m_lastCommandedSpeeds = speeds;
+    
     auto moduleStates = calculateModuleStates(speeds);
     normalizeWheelSpeeds(moduleStates);
 
@@ -194,4 +197,18 @@ void Drivetrain::initializeModulePositions() {
     m_moduleTranslations[1] = frc::Translation2d{units::meter_t{ halfLength}, units::meter_t{-halfWidth}};  // FR
     m_moduleTranslations[2] = frc::Translation2d{units::meter_t{-halfLength}, units::meter_t{ halfWidth}};  // BL
     m_moduleTranslations[3] = frc::Translation2d{units::meter_t{-halfLength}, units::meter_t{-halfWidth}};  // BR
+}
+
+void Drivetrain::driveOnlyDuty(double duty) {
+    for (auto& m : m_modules) {
+        m->setDriveOpenLoop(duty);
+        m->setSteerOpenLoop(0.0);
+    }
+}
+
+void Drivetrain::steerOnlyDuty(double duty) {
+    for (auto& m : m_modules) {
+        m->setDriveOpenLoop(0.0);
+        m->setSteerOpenLoop(duty);
+    }
 }

@@ -3,6 +3,8 @@
 #include <frc/TimedRobot.h>
 #include <frc/filter/SlewRateLimiter.h>  // Input smoothing (tune rates per team preference)
 #include <frc/smartdashboard/Field2d.h> // Visualize odometry on dashboard
+#include <frc/DataLogManager.h>
+#include <wpi/DataLog.h>
 
 #if __has_include(<Studica/AHRS.h>)
 #include <Studica/AHRS.h>
@@ -45,8 +47,6 @@ private:
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
-    bool m_emergencyStop = false; // Emergency stop state
-    bool m_calibrationMode = false; // Encoder calibration mode
 
     // Driver input slew rate limiters (CONFIGURABLE: tune for driver feel)
     // Units: how fast the command can change (per second)
@@ -56,6 +56,9 @@ private:
     double m_prevVy = 0.0;
     double m_prevOmega = 0.0;
     double m_lastUpdateSec = 0.0;
+    
+    // Autonomous timer
+    double m_autoStartTime = 0.0;
 
     // Field visualization (odometry)
     frc::Field2d m_field;
@@ -71,7 +74,7 @@ private:
     void updateDashboard();
     
     /**
-     * Handle calibration mode
+     * Log drivetrain performance data to DataLog for AdvantageScope analysis
      */
-    void handleCalibration();
+    void logDrivetrainPerformance();
 };

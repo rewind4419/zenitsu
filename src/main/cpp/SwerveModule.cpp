@@ -23,6 +23,7 @@ void SwerveModule::setDesiredState(const SwerveModuleState& desiredState) {
     // Optimize the state to avoid spinning more than 90 degrees
     const SwerveModuleState optimizedState = optimizeState(desiredState, currentAngle);
     m_desiredAngle = optimizedState.angle;
+    m_desiredSpeed = optimizedState.speed;
 
     // Drive output normalized -1..1
     const double driveOutput = optimizedState.speed / MAX_DRIVE_SPEED;
@@ -92,6 +93,20 @@ void SwerveModule::resetDriveEncoder() {
 void SwerveModule::stop() {
     m_driveMotor->Set(0.0);
     // Keep steering at current position
+}
+
+void SwerveModule::setDriveOpenLoop(double duty) {
+    if (!std::isfinite(duty)) duty = 0.0;
+    if (duty > 1.0) duty = 1.0;
+    if (duty < -1.0) duty = -1.0;
+    m_driveMotor->Set(duty);
+}
+
+void SwerveModule::setSteerOpenLoop(double duty) {
+    if (!std::isfinite(duty)) duty = 0.0;
+    if (duty > 1.0) duty = 1.0;
+    if (duty < -1.0) duty = -1.0;
+    m_steerMotor->Set(duty);
 }
 
 double SwerveModule::getAbsoluteAngle() const {
