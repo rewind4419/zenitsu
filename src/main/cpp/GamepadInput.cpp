@@ -59,9 +59,7 @@ bool GamepadInput::isTurboMode() const {
 }
 
 double GamepadInput::getSpeedMultiplier() const {
-    if (m_precisionMode) {
-        return PRECISION_DRIVE_SPEED;
-    } else if (m_turboMode) {
+    if (m_turboMode) {
         return TURBO_DRIVE_SPEED;
     } else {
         return NORMAL_DRIVE_SPEED;

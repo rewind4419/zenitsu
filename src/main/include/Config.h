@@ -21,8 +21,8 @@ constexpr int BACK_LEFT_STEER_ID = 4;
 constexpr int BACK_RIGHT_STEER_ID = 9;
 
 // CANcoder IDs (absolute encoders)
-constexpr int FRONT_LEFT_ENCODER_ID = 13;
-constexpr int FRONT_RIGHT_ENCODER_ID = 12;
+constexpr int FRONT_LEFT_ENCODER_ID = 12;
+constexpr int FRONT_RIGHT_ENCODER_ID = 13;
 constexpr int BACK_LEFT_ENCODER_ID = 10;
 constexpr int BACK_RIGHT_ENCODER_ID = 11;
 
@@ -45,15 +45,15 @@ constexpr double STEER_GEAR_RATIO = 12.8;    // Steering gear ratio
 // CONTROL SETTINGS
 // =============================================================================
 
-constexpr double MAX_DRIVE_SPEED = 1.0;      // m/s - reduced from 4.0 to 1.0 to match the physical robot
-constexpr double MAX_ANGULAR_SPEED = 1 * 3.14159; // rad/s - reduced from 2 to 1 multiplier for testing
+constexpr double MAX_DRIVE_SPEED = 2.0;      // m/s - reasonable max speed
+constexpr double MAX_ANGULAR_SPEED = 1 * 3.14159; // rad/s - reasonable max rotation
 
 // Driver control speeds
-constexpr double NORMAL_DRIVE_SPEED = 1.0;   // Normal driving multiplier
-constexpr double PRECISION_DRIVE_SPEED = 0.3; // Precision/slow mode
-constexpr double TURBO_DRIVE_SPEED = 1.0;    // Turbo/fast mode
+constexpr double NORMAL_DRIVE_SPEED = 0.5;   // Normal driving multiplier (1.0 m/s actual)
+constexpr double TURBO_DRIVE_SPEED = 1.0;    // Turbo/fast mode (R1) (2.0 m/s actual)
 
-constexpr double NORMAL_TURN_SPEED = 0.8;    // Normal turning multiplier
+constexpr double NORMAL_TURN_SPEED = 0.5;    // Normal turning multiplier
+constexpr double TURBO_TURN_SPEED = 0.5;     // Turbo turning multiplier (R1) - same as normal
 
 // =============================================================================
 // SAFETY CONFIGURATION
@@ -65,10 +65,10 @@ constexpr double CONTROLLER_TIMEOUT = 0.5;  // Controller disconnect timeout (se
 // CONTROL GAINS (steer P controller)
 // =============================================================================
 
-constexpr double STEER_P_GAIN = 2.0;        // Simple P control for steering (unit: output/radian)
+constexpr double STEER_P_GAIN = 0.3;        // Simple P control for steering (unit: output/radian) - lowered to prevent jitter
 
 // Prefer motor-controller onboard PID for steering if available
-#define USE_ONBOARD_STEER_PID 1
+#define USE_ONBOARD_STEER_PID 0  // Disabled: use software P control
 
 // =============================================================================
 // INPUT SLEW RATES (tune for driver feel)
@@ -82,10 +82,10 @@ constexpr double SLEW_RATE_OMEGA = 6.0;  // rad/s per second
 // ENCODER OFFSETS (radians) - set after calibration
 // =============================================================================
 
-constexpr double FRONT_LEFT_ENCODER_OFFSET  = 0.0;
-constexpr double FRONT_RIGHT_ENCODER_OFFSET = 0.0;
-constexpr double BACK_LEFT_ENCODER_OFFSET   = 0.0;
-constexpr double BACK_RIGHT_ENCODER_OFFSET  = 0.0;
+constexpr double FRONT_LEFT_ENCODER_OFFSET  = -2.0893;
+constexpr double FRONT_RIGHT_ENCODER_OFFSET = -0.9649;
+constexpr double BACK_LEFT_ENCODER_OFFSET   = 0.1289;
+constexpr double BACK_RIGHT_ENCODER_OFFSET  = 2.253;
 
 // =============================================================================
 // PLAYSTATION CONTROLLER MAPPING
@@ -117,8 +117,10 @@ constexpr double JOYSTICK_DEADBAND = 0.1;    // Ignore inputs smaller than this
 // PlayStation DualShock Controller Layout:
 // - Left stick: Drive translation (forward/back, left/right)
 // - Right stick: Rotation (left/right only)
-// - L1 (button 5): Precision mode (slow, careful driving)
-// - R1 (button 6): Turbo mode (fast driving)  
-// - Share (button 9): Toggle field-relative mode
-// - Options (button 10): Reset gyroscope
-// - PS Button (button 14): Emergency stop (terminates all robot functions)
+// - R1 (button 6): Turbo mode (hold for 2.0 m/s drive; default is 1.0 m/s drive)
+// - PS Button (button 14): Toggle field-relative mode
+// 
+// Diagnostic modes:
+// - Options + L1: Drive motors only at 30%
+// - Options + R1: Steer motors only at 20%
+// - Share + Options: 4s steer test, then 4s drive test

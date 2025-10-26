@@ -26,8 +26,6 @@ void Robot::RobotInit() {
     
     // Initialize dashboard
     frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
-    frc::SmartDashboard::PutBoolean("Emergency Stop", m_emergencyStop);
-    frc::SmartDashboard::PutBoolean("Calibration Mode", m_calibrationMode);
     frc::SmartDashboard::PutString("Robot State", "Initialized");
 
     // Show field view for odometry (CONFIGURABLE: use during autos/tuning)
@@ -54,46 +52,50 @@ void Robot::RobotPeriodic() {
 void Robot::AutonomousInit() {
     frc::SmartDashboard::PutString("Robot State", "Autonomous");
     
-    // Stop drivetrain at start of auto
-    m_drivetrain->stop();
+    // Reset auto timer
+    m_autoStartTime = frc::Timer::GetFPGATimestamp().value();
+    printf("Starting autonomous: drive backwards at 50%% for 5 seconds\n");
 }
 
 void Robot::AutonomousPeriodic() {
-    // Simple autonomous: just stop (no autonomous code for drivetrain-only robot)
-    m_drivetrain->stop();
+    double elapsed = frc::Timer::GetFPGATimestamp().value() - m_autoStartTime;
+    
+    if (elapsed < 5.0) {
+        // Drive backwards at 50% speed for 5 seconds
+        ChassisSpeed speeds;
+        speeds.vx = -0.5 * MAX_DRIVE_SPEED;  // Backwards (negative)
+        speeds.vy = 0.0;                      // No strafe
+        speeds.omega = 0.0;                   // No rotation
+        m_drivetrain->drive(speeds);
+        
+        // Print status every 0.5 seconds
+        static double lastPrint = 0.0;
+        if (elapsed - lastPrint > 0.5) {
+            printf("Auto: %.1fs - driving backwards\n", elapsed);
+            lastPrint = elapsed;
+        }
+    } else {
+        // Stop after 5 seconds
+        m_drivetrain->stop();
+    }
 }
 
 void Robot::TeleopInit() {
     frc::SmartDashboard::PutString("Robot State", "Teleop");
     
-    // printf("Zenitsu entering teleop mode\n");
-    // Unnessesary, we will always know when it enters teleop
+    // Print calibration data on teleop start
+    printf("\n========== CALIBRATION DATA ==========\n");
+    auto raw = m_drivetrain->getRawModuleAngles();
+    printf("Copy these values to Config.h if recalibrating:\n");
+    printf("constexpr double FRONT_LEFT_ENCODER_OFFSET  = %.4f;\n", raw[0]);
+    printf("constexpr double FRONT_RIGHT_ENCODER_OFFSET = %.4f;\n", raw[1]);
+    printf("constexpr double BACK_LEFT_ENCODER_OFFSET   = %.4f;\n", raw[2]);
+    printf("constexpr double BACK_RIGHT_ENCODER_OFFSET  = %.4f;\n", raw[3]);
+    printf("======================================\n\n");
 }
 
 void Robot::TeleopPeriodic() {
-    // Check for calibration mode toggle (L1 + R1 + Options)
-    static bool lastCalibrationToggle = false;
-    bool currentCalibrationToggle = m_gamepadInput->isPrecisionMode() && 
-                                   m_gamepadInput->isTurboMode() && 
-                                   m_gamepadInput->getOptionsButton();
-    
-    if (currentCalibrationToggle && !lastCalibrationToggle) {
-        m_calibrationMode = !m_calibrationMode;
-        frc::SmartDashboard::PutBoolean("Calibration Mode", m_calibrationMode);
-        printf("Calibration mode %s\n", m_calibrationMode ? "ENABLED" : "DISABLED");
-        
-        if (m_calibrationMode) {
-            printf("CALIBRATION MODE: Align all wheels forward and record encoder values\n");
-        }
-    }
-    lastCalibrationToggle = currentCalibrationToggle;
-    
-    // Handle based on mode
-    if (m_calibrationMode) {
-        handleCalibration();
-    } else {
-        handleTeleopDrive();
-    }
+    handleTeleopDrive();
 }
 
 void Robot::DisabledInit() {
@@ -112,30 +114,81 @@ void Robot::handleTeleopDrive() {
     // Safety checks
     bool controllerConnected = m_gamepadInput->isControllerConnected();
     
-    // Handle emergency stop
-    static bool lastPSButton = false;
-    bool currentPSButton = m_gamepadInput->getPSButton();
-    if (currentPSButton && !lastPSButton) {
-        m_emergencyStop = !m_emergencyStop;
-        frc::SmartDashboard::PutBoolean("Emergency Stop", m_emergencyStop);
-        printf("Emergency stop %s\n", m_emergencyStop ? "ACTIVATED" : "DEACTIVATED");
-    }
-    lastPSButton = currentPSButton;
-    
     // Stop if safety conditions not met
-    if (m_emergencyStop || !controllerConnected) {
+    if (!controllerConnected) {
         m_drivetrain->stop();
         return;
     }
     
+    // Diagnostic modes (Options + L1/R1, Share + Options)
+    bool optionsBtn = m_gamepadInput->getOptionsButton();
+    bool shareBtn = m_gamepadInput->getShareButton();
+    bool l1Btn = m_gamepadInput->isPrecisionMode();
+    bool r1Btn = m_gamepadInput->isTurboMode();
+    
+    // Options + L1: Drive only at 30%
+    if (optionsBtn && l1Btn && !shareBtn) {
+        m_drivetrain->driveOnlyDuty(0.3);
+        frc::SmartDashboard::PutString("Diag Mode", "Drive Only 30%");
+        return;
+    }
+    
+    // Options + R1: Steer only at 20%
+    if (optionsBtn && r1Btn && !shareBtn) {
+        m_drivetrain->steerOnlyDuty(0.2);
+        frc::SmartDashboard::PutString("Diag Mode", "Steer Only 20%");
+        return;
+    }
+    
+    // Share + Options: 4s steer, then 4s drive
+    if (shareBtn && optionsBtn) {
+        static double diagStartTime = 0.0;
+        double now = frc::Timer::GetFPGATimestamp().value();
+        
+        if (diagStartTime == 0.0) {
+            diagStartTime = now;
+            printf("Starting 4s steer + 4s drive diagnostic\n");
+        }
+        
+        double elapsed = now - diagStartTime;
+        
+        if (elapsed < 4.0) {
+            // First 4 seconds: steer only
+            m_drivetrain->steerOnlyDuty(0.2);
+            frc::SmartDashboard::PutString("Diag Mode", "Steer 4s");
+            printf("Steer test: %.1fs elapsed\n", elapsed);
+        } else if (elapsed < 8.0) {
+            // Next 4 seconds: drive only
+            m_drivetrain->driveOnlyDuty(0.3);
+            frc::SmartDashboard::PutString("Diag Mode", "Drive 4s");
+            printf("Drive test: %.1fs elapsed\n", elapsed - 4.0);
+        } else {
+            // Done
+            m_drivetrain->stop();
+            diagStartTime = 0.0;
+            frc::SmartDashboard::PutString("Diag Mode", "Complete");
+            printf("Diagnostic complete\n");
+        }
+        return;
+    } else {
+        // Reset timer when not in Share+Options mode
+        static double& diagStartTime = *(new double(0.0));
+        diagStartTime = 0.0;
+    }
+    
+    frc::SmartDashboard::PutString("Diag Mode", "Off");
+    
     // Get driver inputs
     Vector2D translation = m_gamepadInput->getDriveTranslation();
-    double rotation = m_gamepadInput->getRotation() * NORMAL_TURN_SPEED;
+    
+    // Apply turn speed multiplier based on mode
+    double turnSpeedMultiplier = m_gamepadInput->isTurboMode() ? TURBO_TURN_SPEED : NORMAL_TURN_SPEED;
+    double rotation = m_gamepadInput->getRotation() * turnSpeedMultiplier;
     
     // Compute target chassis speeds (CONFIGURABLE: tune rates in Config.h)
     const double target_vx = translation.x * MAX_DRIVE_SPEED;
     const double target_vy = translation.y * MAX_DRIVE_SPEED;
-    const double target_omega = rotation * MAX_ANGULAR_SPEED * NORMAL_TURN_SPEED;
+    const double target_omega = rotation * MAX_ANGULAR_SPEED;
 
     // Apply simple manual slew limiting using delta time
     double now = frc::Timer::GetFPGATimestamp().value();
@@ -173,28 +226,15 @@ void Robot::handleTeleopDrive() {
     m_drivetrain->drive(speeds);
     #endif
     
-    // Toggle field-relative mode with Share button
-    static bool lastShareButton = false;
-    bool currentShareButton = m_gamepadInput->getShareButton();
-    if (currentShareButton && !lastShareButton) {
+    // Toggle field-relative mode with PS button (only when not in diagnostic mode)
+    static bool lastPSButton = false;
+    bool currentPSButton = m_gamepadInput->getPSButton();
+    if (currentPSButton && !lastPSButton && !optionsBtn && !shareBtn) {
         m_fieldRelative = !m_fieldRelative;
         frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
         printf("Field-relative mode %s\n", m_fieldRelative ? "ENABLED" : "DISABLED");
     }
-    lastShareButton = currentShareButton;
-    
-    // Reset gyro with Options button
-    static bool lastOptionsButton = false;
-    bool currentOptionsButton = m_gamepadInput->getOptionsButton();
-    if (currentOptionsButton && !lastOptionsButton) {
-        #if NAVX_AVAILABLE
-        m_navx->Reset();
-        printf("NavX gyroscope reset to zero\n");
-        #else
-        printf("Gyro reset requested (NavX not available in this build)\n");
-        #endif
-    }
-    lastOptionsButton = currentOptionsButton;
+    lastPSButton = currentPSButton;
 }
 
 void Robot::updateDashboard() {
@@ -225,31 +265,6 @@ void Robot::updateDashboard() {
     frc::SmartDashboard::PutBoolean("Controller Connected", m_gamepadInput->isControllerConnected());
     
     // Update control mode info
-    frc::SmartDashboard::PutBoolean("Precision Mode (L1)", m_gamepadInput->isPrecisionMode());
     frc::SmartDashboard::PutBoolean("Turbo Mode (R1)", m_gamepadInput->isTurboMode());
     frc::SmartDashboard::PutNumber("Speed Multiplier", m_gamepadInput->getSpeedMultiplier());
-}
-
-void Robot::handleCalibration() {
-    // Stop all drive motors in calibration mode
-    m_drivetrain->stop();
-    
-    // Get raw encoder values for calibration
-    // Note: These would be the values to subtract from raw encoder readings
-    // to get zero when wheels are pointing forward
-    
-
-    //none of these need to be constantly updated, just printed once
-    printf("Instructions", "1. Manually align all wheels to point forward\n");
-    printf("2. Record the encoder values below\n");
-    printf("Instructions3", "3. Update Config.h with these offset values\n");
-    printf("Instructions4", "4. Exit calibration mode when done\n");
-    
-    // Display current raw encoder positions (radians) for copy/paste
-    auto raw = m_drivetrain->getRawModuleAngles();
-    printf("CALIBRATION - Use these as offsets in Config.h (radians):\n");
-    printf("   FRONT_LEFT_ENCODER_OFFSET  = %.6f\n", raw[0]);
-    printf("   FRONT_RIGHT_ENCODER_OFFSET = %.6f\n", raw[1]);
-    printf("   BACK_LEFT_ENCODER_OFFSET   = %.6f\n", raw[2]);
-    printf("   BACK_RIGHT_ENCODER_OFFSET  = %.6f\n", raw[3]);
 }

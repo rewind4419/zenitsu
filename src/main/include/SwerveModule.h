@@ -58,6 +58,16 @@ public:
      */
     double getRawAbsoluteAngle() const;
 
+    /**
+     * Diagnostic: set drive motor duty directly
+     */
+    void setDriveOpenLoop(double duty);
+
+    /**
+     * Diagnostic: set steer motor duty directly
+     */
+    void setSteerOpenLoop(double duty);
+
 private:
     // Hardware
     std::unique_ptr<rev::spark::SparkMax> m_driveMotor;

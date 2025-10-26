@@ -45,8 +45,6 @@ private:
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
-    bool m_emergencyStop = false; // Emergency stop state
-    bool m_calibrationMode = false; // Encoder calibration mode
 
     // Driver input slew rate limiters (CONFIGURABLE: tune for driver feel)
     // Units: how fast the command can change (per second)
@@ -56,6 +54,9 @@ private:
     double m_prevVy = 0.0;
     double m_prevOmega = 0.0;
     double m_lastUpdateSec = 0.0;
+    
+    // Autonomous timer
+    double m_autoStartTime = 0.0;
 
     // Field visualization (odometry)
     frc::Field2d m_field;
@@ -69,9 +70,4 @@ private:
      * Update dashboard values  
      */
     void updateDashboard();
-    
-    /**
-     * Handle calibration mode
-     */
-    void handleCalibration();
 };
