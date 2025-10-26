@@ -38,7 +38,7 @@ constexpr double WHEEL_RADIUS = 0.0508;      // 4 inch wheels -> 2 inch radius
 // GEAR RATIOS
 // =============================================================================
 
-constexpr double DRIVE_GEAR_RATIO = 6.75;    // L2 gearing
+constexpr double DRIVE_GEAR_RATIO = 3.0;    // L2 gearing (was formerly 6.75 in fennec, measured 3.0 rotations)
 constexpr double STEER_GEAR_RATIO = 12.8;    // Steering gear ratio
 
 // =============================================================================
