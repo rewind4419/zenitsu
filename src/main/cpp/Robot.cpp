@@ -52,7 +52,7 @@ void Robot::RobotPeriodic() {
 
     // Update odometry and field visualization when NavX is present
     #if NAVX_AVAILABLE
-    auto pose = m_drivetrain->updateOdometry(m_navx->IsConnected() ? degreesToRadians(m_navx->GetYaw()) : 0.0);
+    auto pose = m_drivetrain->updateOdometry(m_navx->IsConnected() ? degreesToRadians(m_navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES) : 0.0);
     m_field.SetRobotPose(pose);
     #endif
 }
@@ -186,8 +186,8 @@ void Robot::handleTeleopDrive() {
     // Drive the robot
     #if NAVX_AVAILABLE
     if (m_fieldRelative && m_navx->IsConnected()) {
-        // Use NavX for true field-relative driving
-        double gyroAngle = degreesToRadians(m_navx->GetYaw());
+        // Use NavX for true field-relative driving (with yaw offset for physical mounting)
+        double gyroAngle = degreesToRadians(m_navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES);
         m_drivetrain->driveFieldRelative(speeds, gyroAngle);
     } else {
         // Robot-relative driving
