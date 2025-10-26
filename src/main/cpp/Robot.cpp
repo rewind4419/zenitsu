@@ -2,6 +2,7 @@
 #include "Config.h"
 
 #include <frc/smartdashboard/SmartDashboard.h>
+#include <frc/geometry/struct/Pose2dStruct.h>
 
 Robot::Robot() {
     // Constructor - hardware will be initialized in RobotInit()
@@ -245,6 +246,9 @@ void Robot::logDrivetrainPerformance() {
     wpi::log::DataLog& log = frc::DataLogManager::GetLog();
     
     // Create static log entries (created once, reused every loop)
+    // Robot pose for 3D field visualization
+    static wpi::log::StructLogEntry<frc::Pose2d> logPose(log, "Drivetrain/Pose");
+    
     // Chassis speeds
     static wpi::log::DoubleLogEntry logChassisVx(log, "Drivetrain/Chassis/vx");
     static wpi::log::DoubleLogEntry logChassisVy(log, "Drivetrain/Chassis/vy");
@@ -339,4 +343,7 @@ void Robot::logDrivetrainPerformance() {
     logBRSteerOutput.Append(modules[3]->getSteerAppliedOutput());
     logBRDriveCurrent.Append(modules[3]->getDriveOutputCurrent());
     logBRSteerCurrent.Append(modules[3]->getSteerOutputCurrent());
+    
+    // Log robot pose for 3D field visualization in AdvantageScope
+    logPose.Append(m_drivetrain->getPose());
 }
