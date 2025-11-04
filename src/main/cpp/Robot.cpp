@@ -3,6 +3,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/geometry/struct/Pose2dStruct.h>
+#include <frc2/command/CommandScheduler.h>
 
 Robot::Robot() {
     // Constructor - hardware will be initialized in RobotInit()
@@ -36,11 +37,27 @@ void Robot::RobotInit() {
     // Show field view for odometry (CONFIGURABLE: use during autos/tuning)
     frc::SmartDashboard::PutData("Field", &m_field);
     
+    // Create teleop drive command
+    #if NAVX_AVAILABLE
+    void* navxPtr = static_cast<void*>(m_navx.get());
+    #else
+    void* navxPtr = nullptr;
+    #endif
+    m_teleopDriveCommand = std::make_unique<TeleopDriveCommand>(
+        m_drivetrain.get(),
+        m_gamepadInput.get(),
+        navxPtr,
+        &m_fieldRelative
+    );
+    
     printf("Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
     printf("NavX gyroscope connected for field-relative driving\n");
 }
 
 void Robot::RobotPeriodic() {
+    // Run the CommandScheduler - this handles all subsystem periodic methods and command execution
+    frc2::CommandScheduler::GetInstance().Run();
+    
     // Update input every loop
     m_gamepadInput->update();
     
@@ -91,6 +108,9 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
     frc::SmartDashboard::PutString("Robot State", "Teleop");
     
+    // Schedule the teleop drive command as the default command
+    m_drivetrain->SetDefaultCommand(std::move(*m_teleopDriveCommand));
+    
     // Print calibration data on teleop start
     printf("\n========== CALIBRATION DATA ==========\n");
     auto raw = m_drivetrain->getRawModuleAngles();
@@ -103,7 +123,8 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-    handleTeleopDrive();
+    // CommandScheduler handles command execution in RobotPeriodic()
+    // No manual calls needed here
 }
 
 void Robot::DisabledInit() {
@@ -118,100 +139,8 @@ void Robot::DisabledPeriodic() {
     m_drivetrain->stop();
 }
 
-void Robot::handleTeleopDrive() {
-    // Safety checks
-    bool controllerConnected = m_gamepadInput->isControllerConnected();
-    
-    // Stop if safety conditions not met
-    if (!controllerConnected) {
-        m_drivetrain->stop();
-        return;
-    }
-    
-    // Diagnostic modes (Options + L1/R1, Share + Options)
-    bool optionsBtn = m_gamepadInput->getOptionsButton();
-    bool shareBtn = m_gamepadInput->getShareButton();
-    bool l1Btn = m_gamepadInput->isPrecisionMode();
-    bool r1Btn = m_gamepadInput->isTurboMode();
-    
-    // Options + L1: Drive only at 30%
-    if (optionsBtn && l1Btn && !shareBtn) {
-        m_drivetrain->driveOnlyDuty(0.3);
-        frc::SmartDashboard::PutString("Diag Mode", "Drive Only 30%");
-        return;
-    }
-    
-    // Options + R1: Steer only at 20%
-    if (optionsBtn && r1Btn && !shareBtn) {
-        m_drivetrain->steerOnlyDuty(0.2);
-        frc::SmartDashboard::PutString("Diag Mode", "Steer Only 20%");
-        return;
-    }
-    
-    frc::SmartDashboard::PutString("Diag Mode", "Off");
-    
-    // Get driver inputs
-    Vector2D translation = m_gamepadInput->getDriveTranslation();
-    
-    // Apply turn speed multiplier based on mode
-    double turnSpeedMultiplier = m_gamepadInput->isTurboMode() ? TURBO_TURN_SPEED : NORMAL_TURN_SPEED;
-    double rotation = m_gamepadInput->getRotation() * turnSpeedMultiplier;
-    
-    // Compute target chassis speeds (CONFIGURABLE: tune rates in Config.h)
-    const double target_vx = translation.x * MAX_DRIVE_SPEED;
-    const double target_vy = translation.y * MAX_DRIVE_SPEED;
-    const double target_omega = rotation * MAX_ANGULAR_SPEED;
-
-    // Apply simple manual slew limiting using delta time
-    double now = frc::Timer::GetFPGATimestamp().value();
-    double dt = now - m_lastUpdateSec;
-    m_lastUpdateSec = now;
-    auto clampRate = [dt](double prev, double target, double rateLimit) {
-        double maxDelta = rateLimit * std::max(0.0, dt);
-        double delta = target - prev;
-        if (delta > maxDelta) delta = maxDelta;
-        if (delta < -maxDelta) delta = -maxDelta;
-        return prev + delta;
-    };
-
-    m_prevVx    = clampRate(m_prevVx,    target_vx,    SLEW_RATE_VX);
-    m_prevVy    = clampRate(m_prevVy,    target_vy,    SLEW_RATE_VY);
-    m_prevOmega = clampRate(m_prevOmega, target_omega, SLEW_RATE_OMEGA);
-
-    ChassisSpeed speeds;
-    speeds.vx    = m_prevVx;
-    speeds.vy    = m_prevVy;
-    speeds.omega = m_prevOmega;
-    
-    // Drive the robot
-    #if NAVX_AVAILABLE
-    if (m_fieldRelative && m_navx->IsConnected()) {
-        // Use NavX for true field-relative driving (with yaw offset for physical mounting)
-        double gyroAngle = degreesToRadians(m_navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES);
-        m_drivetrain->driveFieldRelative(speeds, gyroAngle);
-    } else {
-        // Robot-relative driving
-        m_drivetrain->drive(speeds);
-    }
-    #else
-    // Robot-relative driving (NavX not available in this build)
-    m_drivetrain->drive(speeds);
-    #endif
-    
-    // Toggle field-relative mode with PS button (only when not in diagnostic mode)
-    static bool lastPSButton = false;
-    bool currentPSButton = m_gamepadInput->getPSButton();
-    if (currentPSButton && !lastPSButton && !optionsBtn && !shareBtn) {
-        m_fieldRelative = !m_fieldRelative;
-        frc::SmartDashboard::PutBoolean("Field Relative", m_fieldRelative);
-        printf("Field-relative mode %s\n", m_fieldRelative ? "ENABLED" : "DISABLED");
-    }
-    lastPSButton = currentPSButton;
-}
-
 void Robot::updateDashboard() {
-    // Update drivetrain telemetry
-    m_drivetrain->updateTelemetry();
+    // Drivetrain telemetry is now handled by Drivetrain::Periodic()
     
     // Update NavX telemetry
     #if NAVX_AVAILABLE

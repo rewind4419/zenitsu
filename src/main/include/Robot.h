@@ -1,5 +1,7 @@
 #pragma once
 
+#include <frc2/command/CommandPtr.h>
+#include <frc2/command/button/CommandXboxController.h>
 #include <frc/TimedRobot.h>
 #include <frc/filter/SlewRateLimiter.h>  // Input smoothing (tune rates per team preference)
 #include <frc/smartdashboard/Field2d.h> // Visualize odometry on dashboard
@@ -16,10 +18,12 @@
 
 #include "Drivetrain.h"
 #include "GamepadInput.h"
+#include "commands/TeleopDriveCommand.h"
+#include "commands/DiagnosticCommands.h"
 
 /**
- * Clean swerve robot implementation
- * Simple, focused robot class for drivetrain-only operation
+ * Command-based swerve robot implementation
+ * Uses TimedRobot with CommandScheduler for subsystem management
  */
 class Robot : public frc::TimedRobot {
 public:
@@ -47,15 +51,6 @@ private:
     
     // Robot state
     bool m_fieldRelative = true;  // Start in field-relative mode
-
-    // Driver input slew rate limiters (CONFIGURABLE: tune for driver feel)
-    // Units: how fast the command can change (per second)
-    // WPILib SlewRateLimiter in 2025 uses units. We keep doubles here for clarity and
-    // apply the rates manually in code to avoid template friction for students.
-    double m_prevVx = 0.0;
-    double m_prevVy = 0.0;
-    double m_prevOmega = 0.0;
-    double m_lastUpdateSec = 0.0;
     
     // Autonomous timer
     double m_autoStartTime = 0.0;
@@ -63,10 +58,8 @@ private:
     // Field visualization (odometry)
     frc::Field2d m_field;
     
-    /**
-     * Handle teleop driving
-     */
-    void handleTeleopDrive();
+    // Commands
+    std::unique_ptr<TeleopDriveCommand> m_teleopDriveCommand;
     
     /**
      * Update dashboard values  

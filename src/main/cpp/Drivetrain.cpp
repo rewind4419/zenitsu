@@ -78,6 +78,12 @@ void Drivetrain::stop() {
     }
 }
 
+void Drivetrain::Periodic() {
+    // Called automatically by CommandScheduler every 20ms
+    // Update telemetry for SmartDashboard
+    updateTelemetry();
+}
+
 std::array<SwerveModuleState, 4> Drivetrain::getModuleStates() const {
     std::array<SwerveModuleState, 4> states;
     for (size_t i = 0; i < 4; i++) {
