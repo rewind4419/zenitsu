@@ -17,6 +17,7 @@ void Robot::RobotInit() {
     // Initialize hardware
     m_drivetrain = std::make_unique<Drivetrain>();
     m_gamepadInput = std::make_unique<GamepadInput>(DRIVER_CONTROLLER_PORT);
+    m_vision = std::make_unique<VisionSubsystem>();
     
     // Initialize NavX via Studica library (if available in this environment)
     #if NAVX_AVAILABLE
@@ -72,6 +73,9 @@ void Robot::RobotPeriodic() {
     auto pose = m_drivetrain->updateOdometry(m_navx->IsConnected() ? degreesToRadians(m_navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES) : 0.0);
     m_field.SetRobotPose(pose);
     #endif
+    
+    // Update pose estimation with vision measurements (Kalman filter fusion)
+    updateVisionPoseEstimation();
 }
 
 void Robot::AutonomousInit() {
@@ -275,4 +279,29 @@ void Robot::logDrivetrainPerformance() {
     
     // Log robot pose for 3D field visualization in AdvantageScope
     logPose.Append(m_drivetrain->getPose());
+}
+
+void Robot::updateVisionPoseEstimation() {
+    // Get estimated pose from vision system
+    auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
+    
+    // If no vision measurement available, return early
+    if (!visionPoseEstimate.has_value()) {
+        return;
+    }
+    
+    // Extract pose and timestamp
+    auto estimatedPose = visionPoseEstimate.value();
+    frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
+    double timestamp = estimatedPose.timestamp.value();
+    
+    // Determine standard deviations based on number of tags detected
+    // More tags = more confident measurement = lower std devs
+    int tagCount = m_vision->getTargetCount();
+    wpi::array<double, 3> stdDevs = (tagCount >= 2) 
+        ? wpi::array<double, 3>{VISION_STD_DEV_X_MULTI, VISION_STD_DEV_Y_MULTI, VISION_STD_DEV_THETA_MULTI}
+        : wpi::array<double, 3>{VISION_STD_DEV_X_SINGLE, VISION_STD_DEV_Y_SINGLE, VISION_STD_DEV_THETA_SINGLE};
+    
+    // Add vision measurement to pose estimator (Kalman filter fusion)
+    m_drivetrain->addVisionMeasurement(visionPose, timestamp, stdDevs);
 }

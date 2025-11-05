@@ -140,23 +140,17 @@ frc::Transform3d VisionSubsystem::createRobotToCameraTransform() {
 }
 
 frc::AprilTagFieldLayout VisionSubsystem::loadFieldLayout() {
-    // For 2026 season - field layout will be available after kickoff in January 2026
-    // Until then, create an empty layout for testing with custom AprilTags
-    
-    printf("Creating empty AprilTag field layout for 2026 season\n");
-    printf("Update this after kickoff (January 2026) to load official field layout\n");
-    
-    // Create an empty layout for testing
-    // Teams can add custom test tags here for pre-season testing
-    frc::AprilTagFieldLayout emptyLayout{
-        {},  // Empty tag list - add test tags as needed
-        units::meter_t{16.54},  // Field length (standard FRC field)
-        units::meter_t{8.21}    // Field width (standard FRC field)
-    };
-    
-    return emptyLayout;
-    
-    // TODO: After 2026 kickoff, replace the above with:
+    // TEMPORARY: Using 2025 Reefscape field for pre-season testing
+    // We have a physical Reefscape field at school with AprilTags already mounted
+    // This enables full pose estimation and autonomous navigation testing
+    // 
+    // TODO: After 2026 kickoff (January 2026), change to:
     // return frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026<GameName>);
+    
+    printf("Loading 2025 Reefscape field layout for testing\n");
+    printf("NOTE: This is temporary - update after 2026 kickoff!\n");
+    
+    auto layout = frc::LoadAprilTagLayoutField(frc::AprilTagField::k2025ReefscapeWelded);
+    return layout;
 }
 

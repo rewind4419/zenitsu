@@ -18,6 +18,7 @@
 
 #include "Drivetrain.h"
 #include "GamepadInput.h"
+#include "VisionSubsystem.h"
 #include "commands/TeleopDriveCommand.h"
 #include "commands/DiagnosticCommands.h"
 
@@ -45,6 +46,7 @@ private:
     // Hardware
     std::unique_ptr<Drivetrain> m_drivetrain;
     std::unique_ptr<GamepadInput> m_gamepadInput;
+    std::unique_ptr<VisionSubsystem> m_vision;
     #if NAVX_AVAILABLE
     std::unique_ptr<studica::AHRS> m_navx;
     #endif
@@ -70,4 +72,10 @@ private:
      * Log drivetrain performance data to DataLog for AdvantageScope analysis
      */
     void logDrivetrainPerformance();
+    
+    /**
+     * Update pose estimation with vision measurements
+     * Fuses AprilTag detections with odometry using Kalman filter
+     */
+    void updateVisionPoseEstimation();
 };
