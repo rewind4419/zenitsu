@@ -110,7 +110,34 @@ constexpr int NAVX_PORT = 0;  // MXP port on roboRIO
 // NavX Yaw Offset: The NavX gyro defines "zero degrees" as the direction it physically points
 // on the chassis. Since our NavX is mounted 90° clockwise from the robot's forward direction,
 // we apply a -90° offset so that "forward" (toward FL/FR modules) reads as 0°.
-constexpr double NAVX_YAW_OFFSET_DEGREES = -90.0;
+constexpr double NAVX_YAW_OFFSET_DEGREES = 270.0;
+
+// =============================================================================
+// VISION CONFIGURATION (PhotonVision)
+// =============================================================================
+
+// Camera name must match the name configured in PhotonVision dashboard
+constexpr const char* PHOTON_CAMERA_NAME = "OrangePi_Camera";
+
+// Camera mounting position relative to robot center (meters and radians)
+// IMPORTANT: Measure these values accurately for your robot!
+constexpr double CAMERA_HEIGHT_METERS = 0.5;     // Height of camera lens above floor
+constexpr double CAMERA_PITCH_RADIANS = 0.0;     // Camera tilt angle (0 = horizontal, + = up)
+constexpr double CAMERA_YAW_RADIANS = 0.0;       // Camera rotation relative to robot forward (0 = forward)
+constexpr double CAMERA_X_OFFSET_METERS = 0.0;   // Forward/back from robot center (+ = forward)
+constexpr double CAMERA_Y_OFFSET_METERS = 0.0;   // Left/right from robot center (+ = left)
+
+// Vision pose estimation standard deviations (trust levels for Kalman filter fusion)
+// Lower values = trust vision more; higher values = trust vision less
+// Single tag detection (less confident)
+constexpr double VISION_STD_DEV_X_SINGLE = 0.5;           // meters
+constexpr double VISION_STD_DEV_Y_SINGLE = 0.5;           // meters
+constexpr double VISION_STD_DEV_THETA_SINGLE = 0.8;       // radians
+
+// Multiple tag detection (more confident - robot sees 2+ tags simultaneously)
+constexpr double VISION_STD_DEV_X_MULTI = 0.1;            // meters
+constexpr double VISION_STD_DEV_Y_MULTI = 0.1;            // meters
+constexpr double VISION_STD_DEV_THETA_MULTI = 0.2;        // radians
 
 // =============================================================================
 // CONTROLLER CONFIGURATION (PlayStation DualShock)
