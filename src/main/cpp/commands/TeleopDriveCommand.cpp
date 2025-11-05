@@ -94,12 +94,18 @@ void TeleopDriveCommand::Execute() {
     // Drive the robot
     #if NAVX_AVAILABLE
     studica::AHRS* navx = static_cast<studica::AHRS*>(m_navx);
-    if (*m_fieldRelativePtr && navx && navx->IsConnected()) {
+    
+    // Check if the user WANTS field-relative and if the navx object exists.
+    // We intentionally do NOT check navx->IsConnected() here because:
+    // 1. The gyro can stream data while IsConnected() is still false (during calibration)
+    // 2. If the gyro is calibrating, GetYaw() returns 0, which is safe
+    // 3. The robot will use the correct heading as soon as calibration completes
+    if (*m_fieldRelativePtr && navx) {
         // Use NavX for true field-relative driving (with yaw offset for physical mounting)
         double gyroAngle = degreesToRadians(navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES);
         m_drivetrain->driveFieldRelative(speeds, gyroAngle);
     } else {
-        // Robot-relative driving
+        // Robot-relative driving (field-relative is OFF or navx pointer is null)
         m_drivetrain->drive(speeds);
     }
     #else

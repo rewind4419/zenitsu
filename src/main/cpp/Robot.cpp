@@ -142,13 +142,16 @@ void Robot::updateDashboard() {
     
     // Update NavX telemetry
     #if NAVX_AVAILABLE
-    if (m_navx->IsConnected()) {
-        frc::SmartDashboard::PutNumber("Gyro Yaw", m_navx->GetYaw());
+    if (m_navx) {
+        // Always show gyro data (even during calibration)
+        frc::SmartDashboard::PutNumber("Gyro Yaw (raw)", m_navx->GetYaw());
+        frc::SmartDashboard::PutNumber("Gyro Yaw (with offset)", m_navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES);
         frc::SmartDashboard::PutNumber("Gyro Pitch", m_navx->GetPitch());
         frc::SmartDashboard::PutNumber("Gyro Roll", m_navx->GetRoll());
-        frc::SmartDashboard::PutBoolean("NavX Connected", true);
+        frc::SmartDashboard::PutBoolean("NavX IsConnected", m_navx->IsConnected());
+        frc::SmartDashboard::PutBoolean("NavX Calibrating", m_navx->IsCalibrating());
     } else {
-        frc::SmartDashboard::PutBoolean("NavX Connected", false);
+        frc::SmartDashboard::PutString("NavX Status", "Not initialized");
     }
     #else
     frc::SmartDashboard::PutString("Gyro Status", "NavX headers not present in CI build");
