@@ -227,6 +227,18 @@ void Robot::logDrivetrainPerformance() {
     static wpi::log::DoubleLogEntry logBRDriveCurrent(log, "Drivetrain/BR/Drive/Current");
     static wpi::log::DoubleLogEntry logBRSteerCurrent(log, "Drivetrain/BR/Steer/Current");
     
+    // Vision system telemetry
+    static wpi::log::BooleanLogEntry logVisionHasTargets(log, "Vision/HasTargets");
+    static wpi::log::IntegerLogEntry logVisionTargetCount(log, "Vision/TargetCount");
+    static wpi::log::IntegerLogEntry logVisionBestTagID(log, "Vision/BestTagID");
+    static wpi::log::DoubleLogEntry logVisionPoseX(log, "Vision/EstimatedPose/X");
+    static wpi::log::DoubleLogEntry logVisionPoseY(log, "Vision/EstimatedPose/Y");
+    static wpi::log::DoubleLogEntry logVisionPoseRotation(log, "Vision/EstimatedPose/Rotation");
+    static wpi::log::DoubleLogEntry logVisionTimestamp(log, "Vision/Timestamp");
+    static wpi::log::DoubleLogEntry logVisionStdDevX(log, "Vision/StdDev/X");
+    static wpi::log::DoubleLogEntry logVisionStdDevY(log, "Vision/StdDev/Y");
+    static wpi::log::DoubleLogEntry logVisionStdDevTheta(log, "Vision/StdDev/Theta");
+    
     // Get data from drivetrain
     auto commandedSpeeds = m_drivetrain->getLastCommandedSpeeds();
     auto actualStates = m_drivetrain->getModuleStates();
@@ -279,6 +291,45 @@ void Robot::logDrivetrainPerformance() {
     
     // Log robot pose for 3D field visualization in AdvantageScope
     logPose.Append(m_drivetrain->getPose());
+    
+    // Log vision system data
+    bool hasTargets = m_vision->hasTargets();
+    logVisionHasTargets.Append(hasTargets);
+    logVisionTargetCount.Append(m_vision->getTargetCount());
+    logVisionBestTagID.Append(m_vision->getBestTargetID());
+    
+    // Log vision pose estimate if available
+    auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
+    if (visionPoseEstimate.has_value()) {
+        auto estimatedPose = visionPoseEstimate.value();
+        frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
+        
+        logVisionPoseX.Append(visionPose.X().value());
+        logVisionPoseY.Append(visionPose.Y().value());
+        logVisionPoseRotation.Append(visionPose.Rotation().Degrees().value());
+        logVisionTimestamp.Append(estimatedPose.timestamp.value());
+        
+        // Log the standard deviations used for this measurement
+        int tagCount = m_vision->getTargetCount();
+        if (tagCount >= 2) {
+            logVisionStdDevX.Append(VISION_STD_DEV_X_MULTI);
+            logVisionStdDevY.Append(VISION_STD_DEV_Y_MULTI);
+            logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_MULTI);
+        } else {
+            logVisionStdDevX.Append(VISION_STD_DEV_X_SINGLE);
+            logVisionStdDevY.Append(VISION_STD_DEV_Y_SINGLE);
+            logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_SINGLE);
+        }
+    } else {
+        // No vision data - log zeros or invalid values
+        logVisionPoseX.Append(0.0);
+        logVisionPoseY.Append(0.0);
+        logVisionPoseRotation.Append(0.0);
+        logVisionTimestamp.Append(0.0);
+        logVisionStdDevX.Append(0.0);
+        logVisionStdDevY.Append(0.0);
+        logVisionStdDevTheta.Append(0.0);
+    }
 }
 
 void Robot::updateVisionPoseEstimation() {
