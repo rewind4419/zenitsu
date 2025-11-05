@@ -172,6 +172,48 @@ void Robot::updateDashboard() {
     // Update control mode info
     frc::SmartDashboard::PutBoolean("Turbo Mode (R1)", m_gamepadInput->isTurboMode());
     frc::SmartDashboard::PutNumber("Speed Multiplier", m_gamepadInput->getSpeedMultiplier());
+    
+    // Vision diagnostic mode (Share + L1)
+    bool shareBtn = m_gamepadInput->getShareButton();
+    bool l1Btn = m_gamepadInput->isPrecisionMode();
+    if (shareBtn && l1Btn) {
+        // Vision diagnostic mode - print detailed vision info
+        frc::SmartDashboard::PutString("Diag Mode", "Vision Test");
+        
+        bool hasTargets = m_vision->hasTargets();
+        int tagCount = m_vision->getTargetCount();
+        int bestTagID = m_vision->getBestTargetID();
+        
+        printf("=== VISION DIAGNOSTIC ===\n");
+        printf("Has Targets: %s\n", hasTargets ? "YES" : "NO");
+        printf("Tag Count: %d\n", tagCount);
+        printf("Best Tag ID: %d\n", bestTagID);
+        
+        if (hasTargets) {
+            auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
+            if (visionPoseEstimate.has_value()) {
+                auto estimatedPose = visionPoseEstimate.value();
+                frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
+                
+                printf("Vision Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
+                       visionPose.X().value(),
+                       visionPose.Y().value(),
+                       visionPose.Rotation().Degrees().value());
+                printf("Timestamp: %.3fs\n", estimatedPose.timestamp.value());
+                printf("Confidence: %s\n", tagCount >= 2 ? "HIGH (multi-tag)" : "MEDIUM (single-tag)");
+            } else {
+                printf("Vision pose estimation failed\n");
+            }
+        }
+        
+        // Compare with fused pose
+        auto fusedPose = m_drivetrain->getPose();
+        printf("Fused Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
+               fusedPose.X().value(),
+               fusedPose.Y().value(),
+               fusedPose.Rotation().Degrees().value());
+        printf("========================\n");
+    }
 }
 
 void Robot::logDrivetrainPerformance() {

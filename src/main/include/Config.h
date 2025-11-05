@@ -155,4 +155,4 @@ constexpr double JOYSTICK_DEADBAND = 0.1;    // Ignore inputs smaller than this
 // Diagnostic modes:
 // - Options + L1: Drive motors only at 30%
 // - Options + R1: Steer motors only at 20%
-// - Share + Options: 4s steer test, then 4s drive test
+// - Share + L1: Vision diagnostic (prints AprilTag detection info)
