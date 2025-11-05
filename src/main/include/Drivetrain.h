@@ -14,12 +14,13 @@
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc2/command/SubsystemBase.h>
 
 /**
- * Clean swerve drivetrain implementation
+ * Command-based swerve drivetrain subsystem
  * Manages 4 swerve modules and provides high-level drive control
  */
-class Drivetrain {
+class Drivetrain : public frc2::SubsystemBase {
 public:
     Drivetrain();
     
@@ -45,6 +46,12 @@ public:
      * Stop all modules
      */
     void stop();
+    
+    /**
+     * Periodic update - called automatically by CommandScheduler
+     * Updates telemetry for SmartDashboard
+     */
+    void Periodic() override;
     
     /**
      * Get current module states (for odometry/debugging)
