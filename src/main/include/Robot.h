@@ -21,6 +21,7 @@
 #include "VisionSubsystem.h"
 #include "commands/TeleopDriveCommand.h"
 #include "commands/DiagnosticCommands.h"
+#include "commands/DriveToAprilTagCommand.h"
 
 /**
  * Command-based swerve robot implementation
@@ -62,6 +63,7 @@ private:
     
     // Commands
     std::unique_ptr<TeleopDriveCommand> m_teleopDriveCommand;
+    std::unique_ptr<DriveToAprilTagCommand> m_autoCommand;
     
     /**
      * Update dashboard values  

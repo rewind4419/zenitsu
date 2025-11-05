@@ -51,6 +51,14 @@ void Robot::RobotInit() {
         &m_fieldRelative
     );
     
+    // Create autonomous command (drive to AprilTag)
+    m_autoCommand = std::make_unique<DriveToAprilTagCommand>(
+        m_drivetrain.get(),
+        m_vision.get(),
+        1.5,  // Target distance: 1.5 meters from tag
+        10.0  // Timeout: 10 seconds
+    );
+    
     printf("Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
     printf("NavX gyroscope connected for field-relative driving\n");
 }
@@ -81,32 +89,18 @@ void Robot::RobotPeriodic() {
 void Robot::AutonomousInit() {
     frc::SmartDashboard::PutString("Robot State", "Autonomous");
     
-    // Reset auto timer
-    m_autoStartTime = frc::Timer::GetFPGATimestamp().value();
-    printf("Starting autonomous: drive forwards at 50%% for 5 seconds\n");
+    // Schedule the autonomous command (drive to AprilTag)
+    if (m_autoCommand) {
+        m_autoCommand->Schedule();
+        printf("Starting autonomous: DriveToAprilTag command scheduled\n");
+    } else {
+        printf("WARNING: Auto command not initialized!\n");
+    }
 }
 
 void Robot::AutonomousPeriodic() {
-    double elapsed = frc::Timer::GetFPGATimestamp().value() - m_autoStartTime;
-    
-    if (elapsed < 5.0) {
-        // Drive forwards at 50% speed for 5 seconds
-        ChassisSpeed speeds;
-        speeds.vx = 0.5 * MAX_DRIVE_SPEED;   // Forwards (positive)
-        speeds.vy = 0.0;                      // No strafe
-        speeds.omega = 0.0;                   // No rotation
-        m_drivetrain->drive(speeds);
-        
-        // Print status every 0.5 seconds
-        static double lastPrint = 0.0;
-        if (elapsed - lastPrint > 0.5) {
-            printf("Auto: %.1fs - driving forwards\n", elapsed);
-            lastPrint = elapsed;
-        }
-    } else {
-        // Stop after 5 seconds
-        m_drivetrain->stop();
-    }
+    // CommandScheduler handles command execution in RobotPeriodic()
+    // No manual calls needed here
 }
 
 void Robot::TeleopInit() {
