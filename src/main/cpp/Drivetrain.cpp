@@ -26,13 +26,19 @@ Drivetrain::Drivetrain() {
         m_moduleTranslations[3]
     );
 
-    // Initialize odometry at origin (guarded; can be used when gyro present)
+    // Initialize pose estimator at origin with state standard deviations
+    // State std devs: how much we trust wheel odometry [x, y, theta]
+    // Lower values = trust odometry more; higher = trust less
+    wpi::array<double, 3> stateStdDevs{0.1, 0.1, 0.1};  // meters, meters, radians
+    
     m_pose = frc::Pose2d{};
-    m_odometry = std::make_unique<frc::SwerveDriveOdometry<4>>(
+    m_poseEstimator = std::make_unique<frc::SwerveDrivePoseEstimator<4>>(
         *m_kinematics,
         frc::Rotation2d{units::radian_t{0.0}},
         getModulePositions(),
-        m_pose
+        m_pose,
+        stateStdDevs,
+        wpi::array<double, 3>{0.9, 0.9, 0.9}  // Vision std devs (placeholder, overridden per measurement)
     );
 }
 
@@ -140,9 +146,9 @@ void Drivetrain::updateTelemetry() {
 }
 
 void Drivetrain::resetOdometry(const frc::Pose2d& pose) {
-    if (m_odometry == nullptr) return;
+    if (m_poseEstimator == nullptr) return;
     m_pose = pose;
-    m_odometry->ResetPosition(
+    m_poseEstimator->ResetPosition(
         frc::Rotation2d{units::radian_t{0.0}},
         getModulePositions(),
         m_pose
@@ -150,12 +156,21 @@ void Drivetrain::resetOdometry(const frc::Pose2d& pose) {
 }
 
 frc::Pose2d Drivetrain::updateOdometry(double gyroAngleRadians) {
-    if (m_odometry == nullptr) return m_pose;
-    m_pose = m_odometry->Update(
+    if (m_poseEstimator == nullptr) return m_pose;
+    m_pose = m_poseEstimator->Update(
         frc::Rotation2d{units::radian_t{gyroAngleRadians}},
         getModulePositions()
     );
     return m_pose;
+}
+
+void Drivetrain::addVisionMeasurement(const frc::Pose2d& visionPose, double timestampSeconds, const wpi::array<double, 3>& stdDevs) {
+    if (m_poseEstimator == nullptr) return;
+    m_poseEstimator->AddVisionMeasurement(
+        visionPose,
+        units::second_t{timestampSeconds},
+        stdDevs
+    );
 }
 
 std::array<SwerveModuleState, 4> Drivetrain::calculateModuleStates(const ChassisSpeed& speeds) const {
