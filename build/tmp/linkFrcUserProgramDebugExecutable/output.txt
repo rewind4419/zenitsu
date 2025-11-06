@@ -1,4 +1,0 @@
-See file:///Users/samhoeben/Documents/1%20-%20Projects/Robotics/unnamed-bot2/zenitsu/build/tmp/linkFrcUserProgramDebugExecutable/output.txt for all output for linkFrcUserProgramDebugExecutable.
-linking frcUserProgram successful.
-
-Finished linkFrcUserProgramDebugExecutable, see full log file:///Users/samhoeben/Documents/1%20-%20Projects/Robotics/unnamed-bot2/zenitsu/build/tmp/linkFrcUserProgramDebugExecutable/output.txt.

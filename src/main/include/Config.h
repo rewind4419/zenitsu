@@ -110,7 +110,7 @@ constexpr int NAVX_PORT = 0;  // MXP port on roboRIO
 // NavX Yaw Offset: The NavX gyro defines "zero degrees" as the direction it physically points
 // on the chassis. Since our NavX is mounted 90° clockwise from the robot's forward direction,
 // we apply a -90° offset so that "forward" (toward FL/FR modules) reads as 0°.
-constexpr double NAVX_YAW_OFFSET_DEGREES = 270.0;
+constexpr double NAVX_YAW_OFFSET_DEGREES = 175.0;
 
 // =============================================================================
 // VISION CONFIGURATION (PhotonVision)

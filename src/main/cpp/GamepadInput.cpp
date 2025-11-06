@@ -23,8 +23,8 @@ void GamepadInput::update() {
         return std::copysign(input * input, input);
     };
     
-    m_driveTranslation.x = squareInput(rawY);  // Forward/backward
-    m_driveTranslation.y = squareInput(rawX);  // Left/right
+    m_driveTranslation.x = squareInput(rawY);   // Forward/backward
+    m_driveTranslation.y = squareInput(-rawX);  // Left/right (inverted)
     m_rotation = squareInput(rawRotation);
     
     // Update button states using PlayStation DualShock button mapping

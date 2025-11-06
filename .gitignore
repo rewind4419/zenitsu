@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+# Gradle build directory
+build/
+
+# Gradle wrapper and cache
+.gradle/

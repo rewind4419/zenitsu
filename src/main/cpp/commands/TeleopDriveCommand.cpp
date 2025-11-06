@@ -4,6 +4,15 @@
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <algorithm>
 
+// Define NAVX_AVAILABLE based on header availability
+#if __has_include(<Studica/AHRS.h>)
+#include <Studica/AHRS.h>
+#define NAVX_AVAILABLE 1
+#else
+#define NAVX_AVAILABLE 0
+#endif
+
+
 TeleopDriveCommand::TeleopDriveCommand(
     Drivetrain* drivetrain,
     GamepadInput* gamepadInput,
@@ -95,6 +104,10 @@ void TeleopDriveCommand::Execute() {
     #if NAVX_AVAILABLE
     studica::AHRS* navx = static_cast<studica::AHRS*>(m_navx);
     
+    // Debug: Show field-relative status
+    frc::SmartDashboard::PutBoolean("Field Relative Enabled", *m_fieldRelativePtr);
+    frc::SmartDashboard::PutBoolean("NavX Pointer Valid", navx != nullptr);
+    
     // Check if the user WANTS field-relative and if the navx object exists.
     // We intentionally do NOT check navx->IsConnected() here because:
     // 1. The gyro can stream data while IsConnected() is still false (during calibration)
@@ -102,19 +115,43 @@ void TeleopDriveCommand::Execute() {
     // 3. The robot will use the correct heading as soon as calibration completes
     if (*m_fieldRelativePtr && navx) {
         // Use NavX for true field-relative driving (with yaw offset for physical mounting)
-        double gyroAngle = degreesToRadians(navx->GetYaw() + NAVX_YAW_OFFSET_DEGREES);
+        double rawYaw = navx->GetYaw();
+        double offsetYaw = rawYaw + NAVX_YAW_OFFSET_DEGREES;
+        
+        // Wrap angle to 0-360 range
+        while (offsetYaw >= 360.0) offsetYaw -= 360.0;
+        while (offsetYaw < 0.0) offsetYaw += 360.0;
+        
+        double gyroAngle = degreesToRadians(offsetYaw);
+        
+        // Debug: Show what angle we're using
+        frc::SmartDashboard::PutNumber("Drive Mode Raw Yaw", rawYaw);
+        frc::SmartDashboard::PutNumber("Drive Mode Offset Yaw", offsetYaw);
+        frc::SmartDashboard::PutNumber("Drive Mode Gyro Angle (rad)", gyroAngle);
+        frc::SmartDashboard::PutString("Drive Mode", "FIELD-RELATIVE");
+        
         m_drivetrain->driveFieldRelative(speeds, gyroAngle);
     } else {
         // Robot-relative driving (field-relative is OFF or navx pointer is null)
+        std::string reason = !(*m_fieldRelativePtr) ? "DISABLED" : "NO NAVX";
+        frc::SmartDashboard::PutString("Drive Mode", "ROBOT-RELATIVE (" + reason + ")");
         m_drivetrain->drive(speeds);
     }
     #else
     // Robot-relative driving (NavX not available in this build)
+    frc::SmartDashboard::PutString("Drive Mode", "ROBOT-RELATIVE (no NavX)");
     m_drivetrain->drive(speeds);
     #endif
     
     // Toggle field-relative mode with PS button (only when not in diagnostic mode)
     bool currentPSButton = m_gamepadInput->getPSButton();
+    
+    // Debug: Show button states
+    frc::SmartDashboard::PutBoolean("PS Button Pressed", currentPSButton);
+    frc::SmartDashboard::PutBoolean("PS Button Last State", m_lastPSButton);
+    frc::SmartDashboard::PutBoolean("Options Button", optionsBtn);
+    frc::SmartDashboard::PutBoolean("Share Button", shareBtn);
+    
     if (currentPSButton && !m_lastPSButton && !optionsBtn && !shareBtn) {
         *m_fieldRelativePtr = !(*m_fieldRelativePtr);
         frc::SmartDashboard::PutBoolean("Field Relative", *m_fieldRelativePtr);

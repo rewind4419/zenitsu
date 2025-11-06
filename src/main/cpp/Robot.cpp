@@ -17,7 +17,16 @@ void Robot::RobotInit() {
     // Initialize hardware
     m_drivetrain = std::make_unique<Drivetrain>();
     m_gamepadInput = std::make_unique<GamepadInput>(DRIVER_CONTROLLER_PORT);
-    m_vision = std::make_unique<VisionSubsystem>();
+    
+    // TODO: Re-enable vision system when Orange Pi is connected
+    // PhotonLib VerifyVersion() blocks for 40-60ms per loop without camera connected
+    // Steps to re-enable:
+    // 1. Connect Orange Pi with PhotonVision running
+    // 2. Uncomment the line below
+    // 3. Uncomment updateVisionPoseEstimation() in RobotPeriodic()
+    // 4. Uncomment m_autoCommand initialization below
+    // 5. Uncomment vision logging in logDrivetrainPerformance()
+    // m_vision = std::make_unique<VisionSubsystem>();
     
     // Initialize NavX via Studica library (if available in this environment)
     #if NAVX_AVAILABLE
@@ -51,13 +60,14 @@ void Robot::RobotInit() {
         &m_fieldRelative
     );
     
+    // TODO: Re-enable when vision system is active (see TODO above)
     // Create autonomous command (drive to AprilTag)
-    m_autoCommand = std::make_unique<DriveToAprilTagCommand>(
-        m_drivetrain.get(),
-        m_vision.get(),
-        1.5,  // Target distance: 1.5 meters from tag
-        10.0  // Timeout: 10 seconds
-    );
+    // m_autoCommand = std::make_unique<DriveToAprilTagCommand>(
+    //     m_drivetrain.get(),
+    //     m_vision.get(),
+    //     1.5,  // Target distance: 1.5 meters from tag
+    //     10.0  // Timeout: 10 seconds
+    // );
     
     printf("Zenitsu Robot Initialized! Ready for lightning-fast swerve driving with PlayStation controller!\n");
     printf("NavX gyroscope connected for field-relative driving\n");
@@ -73,8 +83,13 @@ void Robot::RobotPeriodic() {
     // Update telemetry
     updateDashboard();
     
-    // Log drivetrain performance for AdvantageScope
-    logDrivetrainPerformance();
+    // Log drivetrain performance for AdvantageScope (throttled to 10Hz to reduce CAN bus load)
+    // CAN bus calls (GetAppliedOutput, GetOutputCurrent) are slow, so we only poll every 100ms
+    static int logCounter = 0;
+    if (++logCounter >= 5) {  // Every 5 loops = 100ms at 20ms loop time
+        logDrivetrainPerformance();
+        logCounter = 0;
+    }
 
     // Update odometry and field visualization when NavX is present
     #if NAVX_AVAILABLE
@@ -82,8 +97,9 @@ void Robot::RobotPeriodic() {
     m_field.SetRobotPose(pose);
     #endif
     
+    // TODO: Re-enable when vision system is active (see TODO in RobotInit)
     // Update pose estimation with vision measurements (Kalman filter fusion)
-    updateVisionPoseEstimation();
+    // updateVisionPoseEstimation();
 }
 
 void Robot::AutonomousInit() {
@@ -106,9 +122,6 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
     frc::SmartDashboard::PutString("Robot State", "Teleop");
     
-    // Schedule the teleop drive command as the default command
-    m_drivetrain->SetDefaultCommand(std::move(*m_teleopDriveCommand));
-    
     // Print calibration data on teleop start
     printf("\n========== CALIBRATION DATA ==========\n");
     auto raw = m_drivetrain->getRawModuleAngles();
@@ -121,8 +134,9 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-    // CommandScheduler handles command execution in RobotPeriodic()
-    // No manual calls needed here
+    // Manually execute teleop drive command
+    // (Not using CommandScheduler default command to avoid complexity)
+    m_teleopDriveCommand->Execute();
 }
 
 void Robot::DisabledInit() {
@@ -170,55 +184,56 @@ void Robot::updateDashboard() {
     frc::SmartDashboard::PutBoolean("Turbo Mode (R1)", m_gamepadInput->isTurboMode());
     frc::SmartDashboard::PutNumber("Speed Multiplier", m_gamepadInput->getSpeedMultiplier());
     
+    // TEMPORARILY DISABLED - Requires vision system
     // Vision diagnostic mode (Share + L1)
-    bool shareBtn = m_gamepadInput->getShareButton();
-    bool l1Btn = m_gamepadInput->isPrecisionMode();
-    if (shareBtn && l1Btn) {
-        // Vision diagnostic mode - print detailed vision info (throttled to 1 Hz)
-        frc::SmartDashboard::PutString("Diag Mode", "Vision Test");
-        
-        static double lastPrintTime = 0.0;
-        double currentTime = frc::Timer::GetFPGATimestamp().value();
-        
-        // Only print once per second
-        if (currentTime - lastPrintTime >= 1.0) {
-            lastPrintTime = currentTime;
-            
-            bool hasTargets = m_vision->hasTargets();
-            int tagCount = m_vision->getTargetCount();
-            int bestTagID = m_vision->getBestTargetID();
-            
-            printf("=== VISION DIAGNOSTIC ===\n");
-            printf("Has Targets: %s\n", hasTargets ? "YES" : "NO");
-            printf("Tag Count: %d\n", tagCount);
-            printf("Best Tag ID: %d\n", bestTagID);
-            
-            if (hasTargets) {
-                auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
-                if (visionPoseEstimate.has_value()) {
-                    auto estimatedPose = visionPoseEstimate.value();
-                    frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
-                    
-                    printf("Vision Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
-                           visionPose.X().value(),
-                           visionPose.Y().value(),
-                           visionPose.Rotation().Degrees().value());
-                    printf("Timestamp: %.3fs\n", estimatedPose.timestamp.value());
-                    printf("Confidence: %s\n", tagCount >= 2 ? "HIGH (multi-tag)" : "MEDIUM (single-tag)");
-                } else {
-                    printf("Vision pose estimation failed\n");
-                }
-            }
-            
-            // Compare with fused pose
-            auto fusedPose = m_drivetrain->getPose();
-            printf("Fused Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
-                   fusedPose.X().value(),
-                   fusedPose.Y().value(),
-                   fusedPose.Rotation().Degrees().value());
-            printf("========================\n");
-        }
-    }
+    // bool shareBtn = m_gamepadInput->getShareButton();
+    // bool l1Btn = m_gamepadInput->isPrecisionMode();
+    // if (shareBtn && l1Btn) {
+    //     // Vision diagnostic mode - print detailed vision info (throttled to 1 Hz)
+    //     frc::SmartDashboard::PutString("Diag Mode", "Vision Test");
+    //     
+    //     static double lastPrintTime = 0.0;
+    //     double currentTime = frc::Timer::GetFPGATimestamp().value();
+    //     
+    //     // Only print once per second
+    //     if (currentTime - lastPrintTime >= 1.0) {
+    //         lastPrintTime = currentTime;
+    //         
+    //         bool hasTargets = m_vision->hasTargets();
+    //         int tagCount = m_vision->getTargetCount();
+    //         int bestTagID = m_vision->getBestTargetID();
+    //         
+    //         printf("=== VISION DIAGNOSTIC ===\n");
+    //         printf("Has Targets: %s\n", hasTargets ? "YES" : "NO");
+    //         printf("Tag Count: %d\n", tagCount);
+    //         printf("Best Tag ID: %d\n", bestTagID);
+    //         
+    //         if (hasTargets) {
+    //             auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
+    //             if (visionPoseEstimate.has_value()) {
+    //                 auto estimatedPose = visionPoseEstimate.value();
+    //                 frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
+    //                 
+    //                 printf("Vision Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
+    //                        visionPose.X().value(),
+    //                        visionPose.Y().value(),
+    //                        visionPose.Rotation().Degrees().value());
+    //                 printf("Timestamp: %.3fs\n", estimatedPose.timestamp.value());
+    //                 printf("Confidence: %s\n", tagCount >= 2 ? "HIGH (multi-tag)" : "MEDIUM (single-tag)");
+    //             } else {
+    //                 printf("Vision pose estimation failed\n");
+    //             }
+    //         }
+    //         
+    //         // Compare with fused pose
+    //         auto fusedPose = m_drivetrain->getPose();
+    //         printf("Fused Pose: X=%.2fm, Y=%.2fm, Rot=%.1f°\n",
+    //                fusedPose.X().value(),
+    //                fusedPose.Y().value(),
+    //                fusedPose.Rotation().Degrees().value());
+    //         printf("========================\n");
+    //     }
+    // }
 }
 
 void Robot::logDrivetrainPerformance() {
@@ -339,44 +354,45 @@ void Robot::logDrivetrainPerformance() {
     // Log robot pose for 3D field visualization in AdvantageScope
     logPose.Append(m_drivetrain->getPose());
     
+    // TODO: Re-enable when vision system is active (see TODO in RobotInit)
     // Log vision system data
-    bool hasTargets = m_vision->hasTargets();
-    logVisionHasTargets.Append(hasTargets);
-    logVisionTargetCount.Append(m_vision->getTargetCount());
-    logVisionBestTagID.Append(m_vision->getBestTargetID());
-    
-    // Log vision pose estimate if available
-    auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
-    if (visionPoseEstimate.has_value()) {
-        auto estimatedPose = visionPoseEstimate.value();
-        frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
-        
-        logVisionPoseX.Append(visionPose.X().value());
-        logVisionPoseY.Append(visionPose.Y().value());
-        logVisionPoseRotation.Append(visionPose.Rotation().Degrees().value());
-        logVisionTimestamp.Append(estimatedPose.timestamp.value());
-        
-        // Log the standard deviations used for this measurement
-        int tagCount = m_vision->getTargetCount();
-        if (tagCount >= 2) {
-            logVisionStdDevX.Append(VISION_STD_DEV_X_MULTI);
-            logVisionStdDevY.Append(VISION_STD_DEV_Y_MULTI);
-            logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_MULTI);
-        } else {
-            logVisionStdDevX.Append(VISION_STD_DEV_X_SINGLE);
-            logVisionStdDevY.Append(VISION_STD_DEV_Y_SINGLE);
-            logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_SINGLE);
-        }
-    } else {
-        // No vision data - log zeros or invalid values
-        logVisionPoseX.Append(0.0);
-        logVisionPoseY.Append(0.0);
-        logVisionPoseRotation.Append(0.0);
-        logVisionTimestamp.Append(0.0);
-        logVisionStdDevX.Append(0.0);
-        logVisionStdDevY.Append(0.0);
-        logVisionStdDevTheta.Append(0.0);
-    }
+    // bool hasTargets = m_vision->hasTargets();
+    // logVisionHasTargets.Append(hasTargets);
+    // logVisionTargetCount.Append(m_vision->getTargetCount());
+    // logVisionBestTagID.Append(m_vision->getBestTargetID());
+    // 
+    // // Log vision pose estimate if available
+    // auto visionPoseEstimate = m_vision->getEstimatedGlobalPose();
+    // if (visionPoseEstimate.has_value()) {
+    //     auto estimatedPose = visionPoseEstimate.value();
+    //     frc::Pose2d visionPose = estimatedPose.estimatedPose.ToPose2d();
+    //     
+    //     logVisionPoseX.Append(visionPose.X().value());
+    //     logVisionPoseY.Append(visionPose.Y().value());
+    //     logVisionPoseRotation.Append(visionPose.Rotation().Degrees().value());
+    //     logVisionTimestamp.Append(estimatedPose.timestamp.value());
+    //     
+    //     // Log the standard deviations used for this measurement
+    //     int tagCount = m_vision->getTargetCount();
+    //     if (tagCount >= 2) {
+    //         logVisionStdDevX.Append(VISION_STD_DEV_X_MULTI);
+    //         logVisionStdDevY.Append(VISION_STD_DEV_Y_MULTI);
+    //         logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_MULTI);
+    //     } else {
+    //         logVisionStdDevX.Append(VISION_STD_DEV_X_SINGLE);
+    //         logVisionStdDevY.Append(VISION_STD_DEV_Y_SINGLE);
+    //         logVisionStdDevTheta.Append(VISION_STD_DEV_THETA_SINGLE);
+    //     }
+    // } else {
+    //     // No vision data - log zeros or invalid values
+    //     logVisionPoseX.Append(0.0);
+    //     logVisionPoseY.Append(0.0);
+    //     logVisionPoseRotation.Append(0.0);
+    //     logVisionTimestamp.Append(0.0);
+    //     logVisionStdDevX.Append(0.0);
+    //     logVisionStdDevY.Append(0.0);
+    //     logVisionStdDevTheta.Append(0.0);
+    // }
 }
 
 void Robot::updateVisionPoseEstimation() {
