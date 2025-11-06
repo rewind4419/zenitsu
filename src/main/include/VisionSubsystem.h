@@ -71,6 +71,11 @@ private:
     // AprilTag field layout (loaded from WPILib or custom)
     frc::AprilTagFieldLayout m_fieldLayout;
     
+    // Cached results to avoid multiple network calls per loop cycle
+    photon::PhotonPipelineResult m_latestResult;
+    bool m_hasValidResult = false;
+    bool m_cameraConnected = false;
+    
     /**
      * Create the robot-to-camera transform from Config.h values
      */

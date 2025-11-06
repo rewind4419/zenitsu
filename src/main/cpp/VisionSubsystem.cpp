@@ -25,93 +25,99 @@ VisionSubsystem::VisionSubsystem() {
     // Set fallback strategy for single tag detection
     m_poseEstimator->SetMultiTagFallbackStrategy(photon::PoseStrategy::LOWEST_AMBIGUITY);
     
+    // Initialize cached state
+    m_hasValidResult = false;
+    m_cameraConnected = false;
+    
     printf("VisionSubsystem initialized with camera: %s\n", PHOTON_CAMERA_NAME);
+    printf("NOTE: Camera will fail silently if PhotonVision is not connected\n");
 }
 
 std::optional<photon::EstimatedRobotPose> VisionSubsystem::getEstimatedGlobalPose() {
-    // Get all unread results from the camera
-    auto results = m_camera->GetAllUnreadResults();
-    
-    // If no results, return empty
-    if (results.empty()) {
+    // Use cached result to avoid multiple network calls
+    if (!m_hasValidResult || !m_latestResult.HasTargets()) {
         return std::nullopt;
     }
     
-    // Use the most recent result (last in the vector)
-    auto result = results.back();
-    
-    // If no targets detected, return empty
-    if (!result.HasTargets()) {
-        return std::nullopt;
-    }
-    
-    // Update the pose estimator with the latest result
-    return m_poseEstimator->Update(result);
+    // Update the pose estimator with the cached result
+    return m_poseEstimator->Update(m_latestResult);
 }
 
 bool VisionSubsystem::hasTargets() const {
-    auto results = m_camera->GetAllUnreadResults();
-    if (results.empty()) {
-        return false;
-    }
-    return results.back().HasTargets();
+    return m_hasValidResult && m_latestResult.HasTargets();
 }
 
 photon::PhotonPipelineResult VisionSubsystem::getLatestResult() const {
-    auto results = m_camera->GetAllUnreadResults();
-    if (results.empty()) {
-        return photon::PhotonPipelineResult{};  // Return empty result
-    }
-    return results.back();
+    return m_latestResult;
 }
 
 int VisionSubsystem::getBestTargetID() const {
-    auto results = m_camera->GetAllUnreadResults();
-    if (results.empty()) {
-        return -1;
-    }
-    
-    auto result = results.back();
-    if (!result.HasTargets()) {
+    if (!m_hasValidResult || !m_latestResult.HasTargets()) {
         return -1;
     }
     
     // Get the best target (lowest ambiguity / closest)
-    auto bestTarget = result.GetBestTarget();
+    auto bestTarget = m_latestResult.GetBestTarget();
     return bestTarget.GetFiducialId();
 }
 
 int VisionSubsystem::getTargetCount() const {
-    auto results = m_camera->GetAllUnreadResults();
-    if (results.empty()) {
+    if (!m_hasValidResult || !m_latestResult.HasTargets()) {
         return 0;
     }
-    
-    auto result = results.back();
-    if (!result.HasTargets()) {
-        return 0;
-    }
-    return result.GetTargets().size();
+    return m_latestResult.GetTargets().size();
 }
 
 void VisionSubsystem::Periodic() {
-    // Update SmartDashboard with vision status
+    // Fetch results ONCE per loop cycle (20ms)
+    // This is the ONLY place we call GetAllUnreadResults() to avoid network spam
     auto results = m_camera->GetAllUnreadResults();
+    
+    // Check if camera is connected
     if (results.empty()) {
+        m_hasValidResult = false;
+        m_cameraConnected = false;
+        m_latestResult = photon::PhotonPipelineResult{};
+        
+        // PROMINENT WARNING on SmartDashboard
+        frc::SmartDashboard::PutString("⚠️ VISION STATUS", "❌ CAMERA NOT CONNECTED");
+        frc::SmartDashboard::PutBoolean("Vision/CameraConnected", false);
         frc::SmartDashboard::PutBoolean("Vision/HasTargets", false);
         frc::SmartDashboard::PutNumber("Vision/TargetCount", 0);
         frc::SmartDashboard::PutNumber("Vision/BestTargetID", -1);
+        
+        // Print warning once when connection is lost
+        static bool lastConnectedState = true;
+        if (lastConnectedState) {
+            printf("⚠️ WARNING: PhotonVision camera '%s' not connected!\n", PHOTON_CAMERA_NAME);
+            printf("   Check: 1) Orange Pi powered on, 2) Network connection, 3) PhotonVision running\n");
+            lastConnectedState = false;
+        }
         return;
     }
     
-    auto result = results.back();
-    frc::SmartDashboard::PutBoolean("Vision/HasTargets", result.HasTargets());
+    // Camera is connected - cache the latest result
+    m_hasValidResult = true;
+    m_cameraConnected = true;
+    m_latestResult = results.back();
     
-    if (result.HasTargets()) {
-        frc::SmartDashboard::PutNumber("Vision/TargetCount", result.GetTargets().size());
+    // Print message once when connection is established
+    static bool lastConnectedState = false;
+    if (!lastConnectedState) {
+        printf("✓ PhotonVision camera '%s' connected!\n", PHOTON_CAMERA_NAME);
+        lastConnectedState = true;
+    }
+    
+    // Update SmartDashboard with vision status
+    frc::SmartDashboard::PutString("⚠️ VISION STATUS", "✓ CAMERA CONNECTED");
+    frc::SmartDashboard::PutBoolean("Vision/CameraConnected", true);
+    frc::SmartDashboard::PutBoolean("Vision/HasTargets", m_latestResult.HasTargets());
+    
+    if (m_latestResult.HasTargets()) {
+        frc::SmartDashboard::PutNumber("Vision/TargetCount", m_latestResult.GetTargets().size());
         frc::SmartDashboard::PutNumber("Vision/BestTargetID", getBestTargetID());
         
-        auto bestTarget = result.GetBestTarget();
+        auto bestTarget = m_latestResult.GetBestTarget();
         frc::SmartDashboard::PutNumber("Vision/TargetYaw", bestTarget.GetYaw());
         frc::SmartDashboard::PutNumber("Vision/TargetPitch", bestTarget.GetPitch());
         frc::SmartDashboard::PutNumber("Vision/TargetArea", bestTarget.GetArea());
